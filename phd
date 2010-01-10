@@ -4,6 +4,18 @@
 #
 # eventually, it might be `phd run [app]` if phd gets more sophisticated
 
+configure_apache_vhost() {
+  if [[ -f "PHD_APACHE_VIRTUALHOSTS/$host" ]]; then
+		echo 'Already configured'
+	else
+		echo 'Not yet configured'
+		PHD_APACHE_VIRTUALHOST_TEXT="echo \"$PHD_APACHE_VIRTUALHOST_TEXT\""
+		eval "$PHD_APACHE_VIRTUALHOST_TEXT" > $PHD_APACHE_VIRTUALHOSTS/$host
+		echo 'Application should now be configured'
+		echo 'You will need to reload apache for the application to work'
+	fi
+}
+
 # default apache virtualhosts path
 PHD_APACHE_VIRTUALHOSTS='/etc/apache2/phd-sites'
 PHD_APACHE_CONFIG='/etc/apache2/apache2.conf'
@@ -34,16 +46,16 @@ if [[ -z "$dir" || -z "$host" ]]; then
 	exit
 fi
 
-if [[ -f "$dir/config.ru" ]]; then
-	echo "rack app!"
-
-	if [[ -f "PHD_APACHE_VIRTUALHOSTS/$host" ]]; then
-		echo 'Already configured'
-	else
-		echo 'Not yet configured'
-		PHD_APACHE_VIRTUALHOST_TEXT="echo \"$PHD_APACHE_VIRTUALHOST_TEXT\""
-		eval "$PHD_APACHE_VIRTUALHOST_TEXT" > $PHD_APACHE_VIRTUALHOSTS/$host
-		echo 'Application should now be configured'
-		echo 'You will need to reload apache for the application to work'
-	fi
+if [[ -d "$dir/app" && -d "$dir/app/controllers" && -f "$dir/config/environment.rb" ]]; then
+  echo "rails app!"
+  configure_apache_vhost
+	
+	if [[ !-f "$dir/config/database.yml" ]]; then
+	  cp /var/webbynode/templates/database.yml config
+  fi
+else
+  if [[ -f "$dir/config.ru" ]]; then
+    echo "rack app!"
+    configure_apache_vhost
+  fi
 fi

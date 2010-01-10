@@ -20,7 +20,7 @@ if [[ -z "$( which git-receive-pack_original )" ]]; then
 	echo "Installing PushAnd"
 	mkdir -p $PUSHAND_INSTALL_DIR
 	cd $PUSHAND_INSTALL_DIR
-	git clone git://github.com/remi/pushand.git
+	git clone git://github.com/webbynode/pushand.git
 	cd pushand
 	sudo ./pushand_server_install
 fi
