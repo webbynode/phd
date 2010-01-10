@@ -4,6 +4,16 @@
 #
 # eventually, it might be `phd run [app]` if phd gets more sophisticated
 
+# default apache virtualhosts path
+PHD_APACHE_VIRTUALHOSTS='/etc/apache2/phd-sites'
+PHD_APACHE_CONFIG='/etc/apache2/apache2.conf'
+PHD_APACHE_INCLUDE="Include $PHD_APACHE_VIRTUALHOSTS"
+PHD_APACHE_VIRTUALHOST_TEXT='<VirtualHost *:80>
+  ServerName $host
+  DocumentRoot $dir/public
+  PassengerAppRoot $dir
+</VirtualHost>'
+
 configure_apache_vhost() {
   if [[ -f "PHD_APACHE_VIRTUALHOSTS/$host" ]]; then
 		echo 'Already configured'
@@ -15,16 +25,6 @@ configure_apache_vhost() {
 		echo 'You will need to reload apache for the application to work'
 	fi
 }
-
-# default apache virtualhosts path
-PHD_APACHE_VIRTUALHOSTS='/etc/apache2/phd-sites'
-PHD_APACHE_CONFIG='/etc/apache2/apache2.conf'
-PHD_APACHE_INCLUDE="Include $PHD_APACHE_VIRTUALHOSTS"
-PHD_APACHE_VIRTUALHOST_TEXT='<VirtualHost *:80>
-  ServerName $host
-  DocumentRoot $dir/public
-  PassengerAppRoot $dir
-</VirtualHost>'
 
 # read .phdrc (for overrides)
 if [[ -f ~/.phdrc ]]; then
@@ -51,11 +51,18 @@ if [[ -d "$dir/app" && -d "$dir/app/controllers" && -f "$dir/config/environment.
   
   app_name=$(basename $dir)
   configure_apache_vhost
-  config_app_db $app_name
+  config_app_db $app_name >/dev/null 2>&1
 	
-	if [[ ! -f "$dir/config/database.yml" ]]; then
-	  sed "s/@app_name@/$app_name/g" /var/webbynode/templates/database.yml > $dir/config/database.yml
+  if [[ ! -f "$dir/config/database.yml" ]]; then
+    sed "s/@app_name@/$app_name/g" /var/webbynode/templates/database.yml > $dir/config/database.yml
   fi
+
+  cd $dir
+  rake gems:install
+  rake db:migrate
+  cd -
+  
+  sudo /etc/init.d/apache2 restart 2>&1
 else
   if [[ -f "$dir/config.ru" ]]; then
     echo "rack app!"
