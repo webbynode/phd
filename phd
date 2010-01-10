@@ -19,21 +19,21 @@ host=$2
 app_name=$(basename $dir)
 
 sudo mkdir -p /var/log/phd
+sudo chown -R git:www-data /var/log/phd
+
+echo ""
+echo "----------------------------"
+echo "  Webbynode git deployment "
+echo "----------------------------"
+echo ""
+echo "Deploying application $app_name as $host..."
 
 configure_apache_vhost() {
   if [[ -f "PHD_APACHE_VIRTUALHOSTS/$host" ]]; then
 		echo 'Already configured'
 	else
-		echo ""
-		echo "----------------------------"
-		echo "  Webbynode git deployment "
-		echo "----------------------------"
-		echo ""
-		echo "Deploying application $app_name as $host..."
 		PHD_APACHE_VIRTUALHOST_TEXT="echo \"$PHD_APACHE_VIRTUALHOST_TEXT\""
 		eval "$PHD_APACHE_VIRTUALHOST_TEXT" > $PHD_APACHE_VIRTUALHOSTS/$host
-		echo "Done!"
-		echo ""
 	fi
 }
 
@@ -59,7 +59,7 @@ if [[ -d "$dir/app" && -d "$dir/app/controllers" && -f "$dir/config/environment.
   configure_apache_vhost
 
   echo "  => Configuring database..."
-  sudo config_app_db $app_name > /var/log/phd/config_db.log 2>&1
+  config_app_db $app_name > /var/log/phd/config_db.log 2>&1
 	
   if [[ ! -f "$dir/config/database.yml" ]]; then
     echo "  => Configuring database.yml..."
@@ -71,10 +71,19 @@ if [[ -d "$dir/app" && -d "$dir/app/controllers" && -f "$dir/config/environment.
   sudo rake gems:install > /var/log/phd/gems_install.log 2>&1
   
   echo "  => Migrating database..."
-  sudo rake db:migrate > /var/log/phd/db_migrate.log 2>&1
+  rake db:migrate > /var/log/phd/db_migrate.log 2>&1
+
+  sudo chown -R git:www-data * > /var/log/phd/chown.log 2>&1
   cd -
   
+  echo ""
+  echo "Restarting apache..."
   sudo /etc/init.d/apache2 restart > /var/log/phd/apache2_restart.log 2>&1
+
+  echo ""
+  echo "$app_name deployed successfully."
+  echo ""
+
 else
   if [[ -f "$dir/config.ru" ]]; then
     echo "rack app!"
