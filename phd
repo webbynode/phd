@@ -49,12 +49,12 @@ fi
 if [[ -d "$dir/app" && -d "$dir/app/controllers" && -f "$dir/config/environment.rb" ]]; then
   echo "rails app!"
   
-  $app=$(basename $dir)
+  app_name=$(basename $dir)
   configure_apache_vhost
-  config_app_db $app
+  config_app_db $app_name
 	
 	if [[ ! -f "$dir/config/database.yml" ]]; then
-	  sed "s/@app_name@/$app/g" /var/webbynode/templates/database.yml > $dir/config/database.yml
+	  sed "s/@app_name@/$app_name/g" /var/webbynode/templates/database.yml > $dir/config/database.yml
   fi
 else
   if [[ -f "$dir/config.ru" ]]; then
