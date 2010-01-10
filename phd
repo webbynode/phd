@@ -50,7 +50,7 @@ if [[ -d "$dir/app" && -d "$dir/app/controllers" && -f "$dir/config/environment.
   echo "rails app!"
   configure_apache_vhost
 	
-	if [[ !-f "$dir/config/database.yml" ]]; then
+	if [[ ! -f "$dir/config/database.yml" ]]; then
 	  cp /var/webbynode/templates/database.yml config
   fi
 else
