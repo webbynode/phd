@@ -17,6 +17,12 @@ PHD_APACHE_VIRTUALHOST_TEXT='<VirtualHost *:80>
 dir=$(dirname $1)
 host=$2
 app_name=$(basename $dir)
+base=$host
+
+if [[ ! "$host" =~ "." ]]; then
+  base=$host
+  host="$host.webbyapp.com"
+fi
 
 sudo mkdir -p /var/log/phd
 sudo chown -R git:www-data /var/log/phd
@@ -80,8 +86,20 @@ if [[ -d "$dir/app" && -d "$dir/app/controllers" && -f "$dir/config/environment.
   echo "Restarting apache..."
   sudo /etc/init.d/apache2 restart > /var/log/phd/apache2_restart.log 2>&1
 
+  if [[ ! "$base" =~ "." ]]; then
+    $ip=`ifconfig | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $1}'`
+    echo ""
+    echo "Setting up DNS..."
+    output=`curl -s http://stage.mywebby.info/api/yaml/webbyapp/$base/create?ip=$ip > /var/log/phd/curl.log`
+    name=`echo "$output" | sed -n -e 's/:name: \(.*\)/\1/p' | sed -n -e 's/\( *\)//p'`
+  fi
+
   echo ""
   echo "$app_name deployed successfully."
+  if [[ ! "$base" =~ "." ]]; then
+    echo ""
+    echo "Created http://$name.webbyapp.com/"
+  fi
   echo ""
 
 else
