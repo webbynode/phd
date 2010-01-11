@@ -90,7 +90,7 @@ if [[ -d "$dir/app" && -d "$dir/app/controllers" && -f "$dir/config/environment.
     ip=`ifconfig | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $1}'`
     echo ""
     echo "Setting up DNS..."
-    output=`curl -s http://stage.mywebby.info/api/yaml/webbyapp/$base/create?ip=$ip > /var/log/phd/curl.log`
+    output=`curl -s http://stage.mywebby.info/api/yaml/webbyapp/$base/create?ip=$ip`
     name=`echo "$output" | sed -n -e 's/:name: \(.*\)/\1/p' | sed -n -e 's/\( *\)//p'`
   fi
 
