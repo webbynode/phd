@@ -104,7 +104,31 @@ if [[ -d "$dir/app" && -d "$dir/app/controllers" && -f "$dir/config/environment.
 
 else
   if [[ -f "$dir/config.ru" ]]; then
-    echo "rack app!"
+    echo "Configuring Rack application..."
+    echo "  => Configuring apache vHost..."
     configure_apache_vhost
+
+    echo "  => Configuring database..."
+    config_app_db $app_name > /var/log/phd/config_db.log 2>&1
+
+    echo ""
+    echo "Restarting apache..."
+    sudo /etc/init.d/apache2 restart > /var/log/phd/apache2_restart.log 2>&1
+
+    if [[ ! "$base" =~ "." ]]; then
+      ip=`ifconfig | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $1}'`
+      echo ""
+      echo "Setting up DNS..."
+      output=`curl -s http://stage.mywebby.info/api/yaml/webbyapp/$base/create?ip=$ip`
+      name=`echo "$output" | sed -n -e 's/:name: \(.*\)/\1/p' | sed -n -e 's/\( *\)//p'`
+    fi
+
+    echo ""
+    echo "$app_name deployed successfully."
+    if [[ ! "$base" =~ "." ]]; then
+      echo ""
+      echo "Created http://$name.webbyapp.com/"
+    fi
+    echo ""
   fi
 fi
