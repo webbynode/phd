@@ -46,11 +46,12 @@ fi
 echo "Deploying application $app_name as $host..."
 
 configure_apache_vhost() {
-  if [[ -f "PHD_APACHE_VIRTUALHOSTS/$host" ]]; then
+  if [[ -f "$PHD_APACHE_VIRTUALHOSTS/$host" ]]; then
 		echo 'Already configured'
 	else
 		PHD_APACHE_VIRTUALHOST_TEXT="echo \"$PHD_APACHE_VIRTUALHOST_TEXT\""
 		eval "$PHD_APACHE_VIRTUALHOST_TEXT" > $PHD_APACHE_VIRTUALHOSTS/$host
+		echo "$app_name=$host" >> /var/webbynode/app_mappings
 	fi
 }
 
