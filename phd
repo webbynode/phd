@@ -118,14 +118,6 @@ else
     echo "Restarting apache..."
     sudo /etc/init.d/apache2 restart > /var/log/phd/apache2_restart.log 2>&1
 
-    if [[ ! "$base" =~ "." ]]; then
-      ip=`ifconfig | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $1}'`
-      echo ""
-      echo "Setting up DNS..."
-      output=`curl -s http://stage.mywebby.info/api/yaml/webbyapp/$base/create?ip=$ip`
-      name=`echo "$output" | sed -n -e 's/:name: \(.*\)/\1/p' | sed -n -e 's/\( *\)//p'`
-    fi
-
     echo ""
     echo "$app_name deployed successfully."
     if [[ ! "$base" =~ "." ]]; then
