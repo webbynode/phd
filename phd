@@ -51,7 +51,7 @@ configure_apache_vhost() {
 	else
 		PHD_APACHE_VIRTUALHOST_TEXT="echo \"$PHD_APACHE_VIRTUALHOST_TEXT\""
 		eval "$PHD_APACHE_VIRTUALHOST_TEXT" > $PHD_APACHE_VIRTUALHOSTS/$host
-		echo "$app_name=$host" >> /var/webbynode/app_mappings
+		echo "$host" >> /var/webbynode/mappings/$app_name.conf
 	fi
 }
 
