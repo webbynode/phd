@@ -32,6 +32,17 @@ echo "----------------------------"
 echo "  Webbynode git deployment "
 echo "----------------------------"
 echo ""
+
+
+if [[ ! "$base" =~ "." ]]; then
+  ip=`ifconfig | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $1}'`
+  echo ""
+  echo "Setting up DNS..."
+  output=`curl -s http://stage.mywebby.info/api/yaml/webbyapp/$base/create?ip=$ip`
+  name=`echo "$output" | sed -n -e 's/:name: \(.*\)/\1/p' | sed -n -e 's/\( *\)//p'`
+  host="$name.webbyapp.com"
+fi
+
 echo "Deploying application $app_name as $host..."
 
 configure_apache_vhost() {
@@ -86,19 +97,11 @@ if [[ -d "$dir/app" && -d "$dir/app/controllers" && -f "$dir/config/environment.
   echo "Restarting apache..."
   sudo /etc/init.d/apache2 restart > /var/log/phd/apache2_restart.log 2>&1
 
-  if [[ ! "$base" =~ "." ]]; then
-    ip=`ifconfig | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $1}'`
-    echo ""
-    echo "Setting up DNS..."
-    output=`curl -s http://stage.mywebby.info/api/yaml/webbyapp/$base/create?ip=$ip`
-    name=`echo "$output" | sed -n -e 's/:name: \(.*\)/\1/p' | sed -n -e 's/\( *\)//p'`
-  fi
-
   echo ""
   echo "$app_name deployed successfully."
   if [[ ! "$base" =~ "." ]]; then
     echo ""
-    echo "Created http://$name.webbyapp.com/"
+    echo "Created http://$host/"
   fi
   echo ""
 
