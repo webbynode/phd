@@ -36,8 +36,8 @@ echo ""
 
 if [[ ! "$base" =~ "." ]]; then
   ip=`ifconfig | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $1}'`
-  echo ""
   echo "Setting up DNS..."
+  echo ""
   output=`curl -s http://stage.mywebby.info/api/yaml/webbyapp/$base/create?ip=$ip`
   name=`echo "$output" | sed -n -e 's/:name: \(.*\)/\1/p' | sed -n -e 's/\( *\)//p'`
   host="$name.webbyapp.com"
