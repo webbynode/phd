@@ -12,7 +12,7 @@ PHD_NGINX_VIRTUALHOST_TEXT='http {
     server {
         listen 80;
         server_name $host;
-        root $dir;
+        root $dir/public;
         passenger_enabled on;
     }
 }'
