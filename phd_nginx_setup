@@ -11,10 +11,10 @@ if [[ -f ~/.phdrc ]]; then
 	source ~/.phdrc
 fi
 
-if [[ ! -w "$PHD_NGINX_CONFIG" ]]; then
-	echo "Don't have permission to edit $PHD_NGINX_CONFIG"
-	exit
-fi
+# if [[ ! -w "$PHD_NGINX_CONFIG" ]]; then
+#   echo "Don't have permission to edit $PHD_NGINX_CONFIG"
+#   exit
+# fi
 
 if [[ -z "$( which git-receive-pack_original )" ]]; then
 	echo "Installing PushAnd"
@@ -31,9 +31,9 @@ if [[ ! -f "$PHD_NGINX_VIRTUALHOSTS" ]]; then
 	chmod a+rw $PHD_NGINX_VIRTUALHOSTS
 fi
 
-if [[ -z "$( grep '$PHD_NGINX_INCLUDE' $PHD_NGINX_CONFIG )" ]]; then
-	echo "Including virtualhosts in configuration"
-	sed -i -e "s|#gzip  on;|$PHD_NGINX_INCLUDE|" $PHD_NGINX_CONFIG
-fi
+# if [[ -z "$( grep '$PHD_NGINX_INCLUDE' $PHD_NGINX_CONFIG )" ]]; then
+#   echo "Including virtualhosts in configuration"
+#   sudo sed -i -e "s|#gzip  on;|$PHD_NGINX_INCLUDE|" $PHD_NGINX_CONFIG
+# fi
 
 /etc/init.d/nginx restart
