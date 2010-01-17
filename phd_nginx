@@ -8,13 +8,11 @@
 PHD_NGINX_VIRTUALHOSTS='/opt/nginx/phd-sites'
 PHD_NGINX_CONFIG='/opt/nginx/nginx.conf'
 PHD_NGINX_INCLUDE="include $PHD_NGINX_VIRTUALHOSTS/*;"
-PHD_NGINX_VIRTUALHOST_TEXT='http {
-    server {
-        listen 80;
-        server_name $host;
-        root $dir/public;
-        passenger_enabled on;
-    }
+PHD_NGINX_VIRTUALHOST_TEXT='server {
+    listen 80;
+    server_name $host;
+    root $dir/public;
+    passenger_enabled on;
 }'
 
 dir=$(dirname $1)
