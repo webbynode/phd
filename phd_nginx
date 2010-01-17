@@ -78,7 +78,7 @@ if [[ -d "$dir/app" && -d "$dir/app/controllers" && -f "$dir/config/environment.
   configure_nginx_vhost
 
   echo "  => Configuring database..."
-  config_app_db $app_name > /var/log/phd/config_db.log 2>&1
+  sudo config_app_db $app_name > /var/log/phd/config_db.log 2>&1
 	
   if [[ ! -f "$dir/config/database.yml" ]]; then
     echo "  => Configuring database.yml..."
