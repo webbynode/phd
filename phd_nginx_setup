@@ -33,5 +33,5 @@ fi
 
 if [[ -z "$( grep '$PHD_NGINX_INCLUDE' $PHD_NGINX_CONFIG )" ]]; then
 	echo "Including virtualhosts in configuration"
-	echo $PHD_NGINX_INCLUDE >> $PHD_NGINX_CONFIG
+	sed -i -e "s|#gzip  on;|$PHD_NGINX_INCLUDE|" $PHD_NGINX_CONFIG
 fi
