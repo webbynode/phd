@@ -1,0 +1,133 @@
+#! /bin/bash
+
+# Usage: phd [dir] [host name]
+#
+# eventually, it might be `phd run [app]` if phd gets more sophisticated
+
+# default nginx virtualhosts path
+PHD_NGINX_VIRTUALHOSTS='/opt/nginx/phd-sites'
+PHD_NGINX_CONFIG='/opt/nginx/nginx.conf'
+PHD_NGINX_INCLUDE="include $PHD_NGINX_VIRTUALHOSTS/*;"
+PHD_NGINX_VIRTUALHOST_TEXT='http {
+    server {
+        listen 80;
+        server_name $host;
+        root $dir;
+        passenger_enabled on;
+    }
+}'
+
+dir=$(dirname $1)
+host=$2
+app_name=$(basename $dir)
+base=$host
+
+if [[ ! "$host" =~ "." ]]; then
+  base=$host
+  host="$host.webbyapp.com"
+fi
+
+sudo mkdir -p /var/log/phd
+sudo chown -R git:www-data /var/log/phd
+
+echo ""
+echo "----------------------------"
+echo "  Webbynode git deployment "
+echo "----------------------------"
+echo ""
+
+
+if [[ ! "$base" =~ "." ]]; then
+  ip=`ifconfig | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $1}'`
+  echo "Setting up DNS..."
+  echo ""
+  output=`curl -s https://manager.webbynode.com/api/yaml/webbyapp/$base/create?ip=$ip`
+  name=`echo "$output" | sed -n -e 's/:name: \(.*\)/\1/p' | sed -n -e 's/\( *\)//p'`
+  host="$name.webbyapp.com"
+fi
+
+echo "Deploying application $app_name as $host..."
+
+configure_nginx_vhost() {
+  if [[ -f "$PHD_NGINX_VIRTUALHOSTS/$host" ]]; then
+		echo 'Already configured'
+	else
+		PHD_NGINX_VIRTUALHOST_TEXT="echo \"$PHD_NGINX_VIRTUALHOST_TEXT\""
+		eval "$PHD_NGINX_VIRTUALHOST_TEXT" > $PHD_NGINX_VIRTUALHOSTS/$host
+		echo "$host" >> /var/webbynode/mappings/$app_name.conf
+	fi
+}
+
+# read .phdrc (for overrides)
+if [[ -f ~/.phdrc ]]; then
+	source ~/.phdrc
+fi
+
+# if [[ ! -f "$PHD_NGINX_VIRTUALHOSTS" ]]; then
+#   echo "$PHD_NGINX_VIRTUALHOSTS hasn't been configured"
+#   echo "It needs to be editable by the git user"  
+# fi
+
+if [[ -z "$dir" || -z "$host" ]]; then
+	echo "Usage: phd [application's .git directory] [hostname]"
+	exit
+fi
+
+if [[ -d "$dir/app" && -d "$dir/app/controllers" && -f "$dir/config/environment.rb" ]]; then
+  echo "Configuring Rails application..."
+  
+  echo "  => Configuring nginx vHost..."
+  configure_nginx_vhost
+
+  echo "  => Configuring database..."
+  config_app_db $app_name > /var/log/phd/config_db.log 2>&1
+	
+  if [[ ! -f "$dir/config/database.yml" ]]; then
+    echo "  => Configuring database.yml..."
+    sed "s/@app_name@/$app_name/g" /var/webbynode/templates/database.yml > $dir/config/database.yml
+  fi
+
+  cd $dir
+  echo "  => Installing missing gems..."
+  sudo RAILS_ENV=production rake gems:install > /var/log/phd/gems_install.log 2>&1
+  
+  echo "  => Migrating database..."
+  RAILS_ENV=production rake db:migrate > /var/log/phd/db_migrate.log 2>&1
+
+  sudo chown -R git:www-data * > /var/log/phd/chown.log 2>&1
+  cd -
+  
+  echo ""
+  echo "Restarting nginx..."
+  sudo /etc/init.d/nginx restart > /var/log/phd/nginx_restart.log 2>&1
+
+  echo ""
+  echo "$app_name deployed successfully."
+  if [[ ! "$base" =~ "." ]]; then
+    echo ""
+    echo "Created http://$host/"
+  fi
+  echo ""
+
+else
+  if [[ -f "$dir/config.ru" ]]; then
+    echo "Configuring Rack application..."
+    echo "  => Configuring nginx vHost..."
+    configure_nginx_vhost
+
+    echo "  => Configuring database..."
+    config_app_db $app_name > /var/log/phd/config_db.log 2>&1
+
+    echo ""
+    echo "Restarting nginx..."
+    sudo /etc/init.d/nginx restart > /var/log/phd/nginx_restart.log 2>&1
+
+    echo ""
+    echo "$app_name deployed successfully."
+    if [[ ! "$base" =~ "." ]]; then
+      echo ""
+      echo "Created http://$name.webbyapp.com/"
+    fi
+    echo ""
+  fi
+fi
