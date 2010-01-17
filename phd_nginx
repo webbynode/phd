@@ -97,7 +97,9 @@ if [[ -d "$dir/app" && -d "$dir/app/controllers" && -f "$dir/config/environment.
   
   echo ""
   echo "Restarting nginx..."
-  sudo /etc/init.d/nginx restart > /var/log/phd/nginx_restart.log 2>&1
+  sudo /etc/init.d/nginx stop > /var/log/phd/nginx_restart.log 2>&1
+  sleep 1
+  sudo /etc/init.d/nginx start > /var/log/phd/nginx_restart.log 2>&1
 
   echo ""
   echo "$app_name deployed successfully."
