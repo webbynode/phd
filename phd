@@ -38,7 +38,7 @@ if [[ ! "$base" =~ "." ]]; then
   ip=`ifconfig | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $1}'`
   echo "Setting up DNS..."
   echo ""
-  output=`curl -s https://manager.webbynode.com/api/yaml/webbyapp/$base/create?ip=$ip`
+  output=`curl -s https://manager.webby/api/yaml/webbyapp/$base/create?ip=$ip`
   name=`echo "$output" | sed -n -e 's/:name: \(.*\)/\1/p' | sed -n -e 's/\( *\)//p'`
   host="$name.webbyapp.com"
 fi
@@ -86,10 +86,10 @@ if [[ -d "$dir/app" && -d "$dir/app/controllers" && -f "$dir/config/environment.
 
   cd $dir
   echo "  => Installing missing gems..."
-  sudo rake gems:install > /var/log/phd/gems_install.log 2>&1
+  sudo RAILS_ENV=production rake gems:install > /var/log/phd/gems_install.log 2>&1
   
   echo "  => Migrating database..."
-  rake db:migrate > /var/log/phd/db_migrate.log 2>&1
+  RAILS_ENV=production rake db:migrate > /var/log/phd/db_migrate.log 2>&1
 
   sudo chown -R git:www-data * > /var/log/phd/chown.log 2>&1
   cd -
