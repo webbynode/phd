@@ -18,7 +18,7 @@ if [[ "$WEB_SERVER" == "nginx" ]]; then
   # default nginx virtualhosts path
   PHD_VIRTUALHOSTS='/opt/nginx/phd-sites'
   PHD_CONFIG='/opt/nginx/conf/nginx.conf'
-  PHD_INCLUDE="include $PHD_NGINX_VIRTUALHOSTS/*;"
+  PHD_INCLUDE="  include $PHD_VIRTUALHOSTS/*;"
 else
   # default apache virtualhosts path
   PHD_VIRTUALHOSTS='/etc/apache2/phd-sites'
