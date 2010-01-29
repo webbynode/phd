@@ -136,10 +136,8 @@ if [[ ! -z "$app_engine" ]]; then
 else
   if [[ -d "$dir/app" && -d "$dir/app/controllers" && -f "$dir/config/environment.rb" ]]; then
     . $PHD_ROOT/scripts/rails.sh
-  else
-    if [[ -f "$dir/config.ru" ]]; then
-      . $PHD_ROOT/scripts/rack.sh
-    fi
+  elif [[ -f "$dir/config.ru" ]]; then
+    . $PHD_ROOT/scripts/rack.sh
   fi
 fi
 
