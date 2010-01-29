@@ -1,9 +1,31 @@
 #! /bin/bash
 
-# default apache virtualhosts path
-PHD_APACHE_VIRTUALHOSTS='/etc/apache2/phd-sites'
-PHD_APACHE_CONFIG='/etc/apache2/apache2.conf'
-PHD_APACHE_INCLUDE="Include $PHD_APACHE_VIRTUALHOSTS"
+if [[ -d "/opt/nginx" ]]; then
+  echo "Nginx+Passenger webserver detected..."
+  WEB_SERVER="nginx"
+  WEB_SERVER_ROOT="/opt/nginx"
+elif [[ -d '/etc/nginx' ]]; then
+  echo "Nginx webserver detected..."
+  WEB_SERVER="nginx"
+  WEB_SERVER_ROOT="/etc/nginx"
+else
+  echo "Apache webserver detected..."
+  WEB_SERVER="apache"
+  WEB_SERVER_ROOT='/etc/apache2'
+fi
+
+if [[ "$WEB_SERVER" == "nginx" ]]; then
+  # default nginx virtualhosts path
+  PHD_VIRTUALHOSTS='/opt/nginx/phd-sites'
+  PHD_CONFIG='/opt/nginx/conf/nginx.conf'
+  PHD_INCLUDE="include $PHD_NGINX_VIRTUALHOSTS/*;"
+else
+  # default apache virtualhosts path
+  PHD_VIRTUALHOSTS='/etc/apache2/phd-sites'
+  PHD_CONFIG='/etc/apache2/apache2.conf'
+  PHD_INCLUDE="Include $PHD_VIRTUALHOSTS"
+fi
+
 PUSHAND_INSTALL_DIR=~/tmp
 
 # read .phdrc (for overrides)
@@ -11,8 +33,8 @@ if [[ -f ~/.phdrc ]]; then
 	source ~/.phdrc
 fi
 
-if [[ ! -w "$PHD_APACHE_CONFIG" ]]; then
-	echo "Don't have permission to edit $PHD_APACHE_CONFIG"
+if [[ ! -w "$PHD_CONFIG" ]]; then
+	echo "Don't have permission to edit $PHD_CONFIG"
 	exit
 fi
 
@@ -25,13 +47,13 @@ if [[ -z "$( which git-receive-pack_original )" ]]; then
 	sudo ./pushand_server_install
 fi
 
-if [[ ! -f "$PHD_APACHE_VIRTUALHOSTS" ]]; then
+if [[ ! -f "$PHD_VIRTUALHOSTS" ]]; then
 	echo "Creating virtualhosts directory"
-	mkdir -p $PHD_APACHE_VIRTUALHOSTS
-	chmod a+rw $PHD_APACHE_VIRTUALHOSTS
+	mkdir -p $PHD_VIRTUALHOSTS
+	chmod a+rw $PHD_VIRTUALHOSTS
 fi
 
-if [[ -z "$( grep '$PHD_APACHE_INCLUDE' $PHD_APACHE_CONFIG )" ]]; then
+if [[ -z "$( grep '$PHD_INCLUDE' $PHD_CONFIG )" ]]; then
 	echo "Including virtualhosts in configuration"
-	echo $PHD_APACHE_INCLUDE >> $PHD_APACHE_CONFIG
+	echo $PHD_INCLUDE >> $PHD_CONFIG
 fi
