@@ -21,9 +21,16 @@ already_existed=$?
 echo "  => Configuring database..."
 sudo config_app_db $app_name > /var/log/phd/config_db.log 2>&1
 
+# checks the db/username
+name=$app_name
+name=${name//[-._]/}
+if [ ${name} -gt 15 ]; then
+  name=$(echo $name | cut -c1-15)
+fi
+
 if [[ ! -f "$dir/config/database.yml" ]]; then
   echo "  => Configuring database.yml..."
-  sed "s/@app_name@/$app_name/g" /var/webbynode/templates/rails/database.yml > $dir/config/database.yml
+  sed "s/@app_name@/$name/g" /var/webbynode/templates/rails/database.yml > $dir/config/database.yml
 fi
 
 cd $dir
