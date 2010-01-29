@@ -24,7 +24,7 @@ sudo config_app_db $app_name > /var/log/phd/config_db.log 2>&1
 # checks the db/username
 name=$app_name
 name=${name//[-._]/}
-if [ ${name} -gt 15 ]; then
+if [ ${#name} -gt 15 ]; then
   name=$(echo $name | cut -c1-15)
 fi
 
