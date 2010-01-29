@@ -138,6 +138,8 @@ else
     . $PHD_ROOT/scripts/rails.sh
   elif [[ -f "$dir/config.ru" ]]; then
     . $PHD_ROOT/scripts/rack.sh
+  else
+    echo "WARNING: Didn't detect what application engine you're using."
   fi
 fi
 

@@ -18,16 +18,12 @@ echo "Configuring Rack application..."
 configure_vhost
 already_existed=$?
 
+if [[ ! -d "$dir/public" ]]; then
+  echo "     WARNING: Missing public folder on your Rack app, it'll not run smoothly!"
+fi
+
 echo "  => Configuring database..."
 config_app_db $app_name > /var/log/phd/config_db.log 2>&1
 
 echo ""
 restart_webserver $already_existed
-
-echo ""
-echo "$app_name deployed successfully."
-if [[ ! "$base" =~ "." ]]; then
-  echo ""
-  echo "Created http://$name.webbyapp.com/"
-fi
-echo ""
