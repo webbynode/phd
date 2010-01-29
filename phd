@@ -14,7 +14,7 @@ if [[ -d "/opt/nginx" ]]; then
   echo "Nginx+Passenger webserver detected..."
   WEB_SERVER="nginx"
   WEB_SERVER_ROOT="/opt/nginx"
-else if [[ -d '/etc/nginx' ]]; then
+elif [[ -d '/etc/nginx' ]]; then
   echo "Nginx webserver detected..."
   WEB_SERVER="nginx"
   WEB_SERVER_ROOT="/etc/nginx"
