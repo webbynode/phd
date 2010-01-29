@@ -4,6 +4,29 @@
 #
 # eventually, it might be `phd run [app]` if phd gets more sophisticated
 
+if [[ -z "$1" ]]; then
+	echo "Usage: phd [application's .git directory] [hostname] [app_engine]"
+	exit
+fi
+
+PHD_ROOT=/var/webbynode/phd
+
+dir=$(dirname $1)
+host=$2
+app_name=$(basename $dir)
+base=$host
+app_engine=$3
+
+if [[ ! "$host" =~ "." ]]; then
+  base=$host
+  host="$host.webbyapp.com"
+fi
+
+# read .phdrc (for overrides)
+if [[ -f ~/.phdrc ]]; then
+	source ~/.phdrc
+fi
+
 echo ""
 echo "----------------------------"
 echo "  Webbynode git deployment "
@@ -37,17 +60,6 @@ else
 fi
 
 PUSHAND_INSTALL_DIR=~/tmp
-
-dir=$(dirname $1)
-host=$2
-app_name=$(basename $dir)
-base=$host
-app_engine=$3
-
-if [[ ! "$host" =~ "." ]]; then
-  base=$host
-  host="$host.webbyapp.com"
-fi
 
 sudo mkdir -p /var/log/phd
 sudo chown -R git:www-data /var/log/phd
@@ -114,29 +126,19 @@ restart_webserver() {
   fi
 }
 
-# read .phdrc (for overrides)
-if [[ -f ~/.phdrc ]]; then
-	source ~/.phdrc
-fi
-
-if [[ -z "$dir" || -z "$host" ]]; then
-	echo "Usage: phd [application's .git directory] [hostname] [app_engine]"
-	exit
-fi
-
 if [[ ! -z "$app_engine" ]]; then
-  if [[ ! -x "scripts/$appengine.sh" ]]; then
+  if [[ ! -x "$PHD_ROOT/scripts/$appengine.sh" ]]; then
     echo "Missing support for engine: $appengine. Aborting."
     exit
   else
-    . scripts/$app_engine.sh
+    . $PHD_ROOT/scripts/$app_engine.sh
   fi
 else
   if [[ -d "$dir/app" && -d "$dir/app/controllers" && -f "$dir/config/environment.rb" ]]; then
-    . scripts/rails.sh
+    . $PHD_ROOT/scripts/rails.sh
   else
     if [[ -f "$dir/config.ru" ]]; then
-      . scripts/rack.sh
+      . $PHD_ROOT/scripts/rack.sh
     fi
   fi
 fi
