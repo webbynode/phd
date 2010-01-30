@@ -15,7 +15,6 @@ dir=$(dirname $1)
 host=$2
 app_name=$(basename $dir)
 base=$host
-app_engine=$3
 
 if [[ ! "$host" =~ "." ]]; then
   base=$host
@@ -128,9 +127,13 @@ restart_webserver() {
   fi
 }
 
+if [ -f "$dir/.webbynode/engine" ]; then
+  app_engine=`cat $dir/.webbynode/engine`
+fi
+
 if [[ ! -z "$app_engine" ]]; then
-  if [[ ! -x "$PHD_ROOT/scripts/$appengine.sh" ]]; then
-    echo "Missing support for engine: $appengine. Aborting."
+  if [[ ! -f "$PHD_ROOT/scripts/$app_engine.sh" ]]; then
+    echo "Missing support for engine: $app_engine. Aborting."
     exit
   else
     . $PHD_ROOT/scripts/$app_engine.sh
