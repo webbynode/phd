@@ -121,7 +121,9 @@ restart_webserver() {
     if [[ "$WEB_SERVER" == "apache" ]]; then
       sudo /etc/init.d/apache2 restart > /var/log/phd/apache2_restart.log 2>&1
     else
-      sudo /etc/init.d/nginx restart > /var/log/phd/nginx_restart.log 2>&1
+      sudo /etc/init.d/nginx stop  > /var/log/phd/nginx_stop.log 2>&1
+      sleep 2
+      sudo /etc/init.d/nginx start > /var/log/phd/nginx_start.log 2>&1
     fi
   fi
 }
