@@ -10,7 +10,7 @@ if [[ "$WEB_SERVER" == "apache" ]]; then
 
     echo "  => Installing dependencies, this can take a few minutes..."
     
-    sudo apt-get -y -q php5 php5-cli libapache2-mod-php5 libapache2-mod-auth-mysql php5-mysql php5-pqsql
+    sudo apt-get -y -q install php5 php5-cli libapache2-mod-php5 libapache2-mod-auth-mysql php5-mysql php5-pqsql
   fi
   
 else
