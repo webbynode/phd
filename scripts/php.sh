@@ -7,7 +7,11 @@ else
   PHD_VIRTUALHOST_TEXT='server {
       listen 80;
       server_name $host;
-      root $dir;
+      
+      location / {
+              root   $dir;
+              index  index.php index.html index.htm;
+      }
 
       location ~ \.php$ {
               fastcgi_pass   127.0.0.1:9000;
