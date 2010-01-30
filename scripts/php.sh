@@ -3,6 +3,8 @@ if [[ "$WEB_SERVER" == "apache" ]]; then
     ServerName $host
     DocumentRoot $dir
   </VirtualHost>'
+  
+  sudo apt-get -y -q php5 libapache2-mod-php5 libapache2-mod-auth-mysql php5-mysql 
 else
   PHD_VIRTUALHOST_TEXT='server {
       listen 80;
@@ -24,13 +26,13 @@ else
   if [[ ! -x "/usr/bin/php" ]]; then
     echo "Adding PHP support to nginx..."
 
-    apt-get -y -q install php5-cgi php5-mysql php5-curl php5-gd php5-idn php-pear php5-imagick php5-imap php5-mcrypt php5-memcache php5-mhash php5-ming php5-pspell php5-recode php5-snmp php5-sqlite php5-tidy php5-xmlrpc php5-xsl lighttpd
-    update-rc.d -f lighttpd remove
+    sudo apt-get -y -q install php5-cgi php5-mysql php5-curl php5-gd php5-idn php-pear php5-imagick php5-imap php5-mcrypt php5-memcache php5-mhash php5-ming php5-pspell php5-recode php5-snmp php5-sqlite php5-tidy php5-xmlrpc php5-xsl lighttpd
+    sudo update-rc.d -f lighttpd remove
 
-    echo "#!/bin/sh -e
+    sudo echo "#!/bin/sh -e
 /usr/bin/spawn-fcgi -a 127.0.0.1 -p 9000 -u www-data -g www-data -f /usr/bin/php5-cgi -P /var/run/fastcgi-php.pid 
 exit 0" > /etc/rc.local
-    chmod +x /etc/rc.local
+    sudo chmod +x /etc/rc.local
   
     echo "Done!"
     echo ""
