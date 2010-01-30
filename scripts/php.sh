@@ -2,9 +2,16 @@ if [[ "$WEB_SERVER" == "apache" ]]; then
   PHD_VIRTUALHOST_TEXT='<VirtualHost *:80>
     ServerName $host
     DocumentRoot $dir
+    DirectoryIndex index.php index.html index.htm
   </VirtualHost>'
   
-  sudo apt-get -y -q php5 php5-cli libapache2-mod-php5 libapache2-mod-auth-mysql php5-mysql php5-pqsql
+  if [[ ! -x "/usr/bin/php" ]]; then
+    echo "Adding PHP support to Apache..."
+
+    echo "  => Installing dependencies, this can take a few minutes..."
+    
+    sudo apt-get -y -q php5 php5-cli libapache2-mod-php5 libapache2-mod-auth-mysql php5-mysql php5-pqsql
+  fi
   
 else
   PHD_VIRTUALHOST_TEXT='server {
