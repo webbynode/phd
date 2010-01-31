@@ -113,8 +113,8 @@ restart_webserver() {
   echo ""
   if [[ "$1" == "1" ]]; then
     echo "Restarting passenger..."
-    mkdir -p tmp
-    touch tmp/restart.txt > /var/log/phd/passenger_restart.log 2>&1
+    mkdir -p $dir/tmp
+    touch $dir/tmp/restart.txt > /var/log/phd/passenger_restart.log 2>&1
   else
     echo "Restarting $WEB_SERVER"
     if [[ "$WEB_SERVER" == "apache" ]]; then
