@@ -72,6 +72,19 @@ if [[ ! "$base" =~ "." ]]; then
   host="$name.webbyapp.com"
 fi
 
+app_dns=$(cat /var/webbynode/mappings/$app_name.conf)
+if [[ "$app_dns" != "$host" ]]; then
+  echo "Application dns entry changed from $app_dns to $host"
+  echo "  => Fixing mapping"
+  rm /var/webbynode/mapping/$app_name.conf
+  echo $host > /var/webbynode/mapping/$app_name.conf
+  
+  echo "  => Removing vHost for $app_dns"
+  rm $PHD_VIRTUALHOSTS/$app_dns
+  
+  echo ""
+fi
+
 echo "Deploying application $app_name as $host..."
 
 configure_apache_vhost() {
