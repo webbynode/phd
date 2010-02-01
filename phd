@@ -72,7 +72,9 @@ if [[ ! "$base" =~ "." ]]; then
   host="$name.webbyapp.com"
 fi
 
+puts "AppName: $app_name"
 app_dns=$(cat /var/webbynode/mappings/$app_name.conf)
+puts "Host: $host AppDNS: $app_name"
 if [[ "$app_dns" != "$host" ]]; then
   echo "Application dns entry changed from $app_dns to $host"
   echo "  => Fixing mapping"
