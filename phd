@@ -5,14 +5,14 @@
 # eventually, it might be `phd run [app]` if phd gets more sophisticated
 
 if [[ -z "$1" ]]; then
-	echo "Usage: phd [application's .git directory] [hostname] [app_engine]"
+	echo "Usage: phd [application's .git directory] [hostname]" 
 	exit
 fi
 
 PHD_ROOT=/var/webbynode/phd
 
 dir=$(dirname $1)
-host=$2
+host=$3
 app_name=$(basename $dir)
 base=$host
 
@@ -72,19 +72,18 @@ if [[ ! "$base" =~ "." ]]; then
   host="$name.webbyapp.com"
 fi
 
-puts "AppName: $app_name"
-app_dns=$(cat /var/webbynode/mappings/$app_name.conf)
-puts "Host: $host AppDNS: $app_name"
-if [[ "$app_dns" != "$host" ]]; then
-  echo "Application dns entry changed from $app_dns to $host"
-  echo "  => Fixing mapping"
-  rm /var/webbynode/mapping/$app_name.conf
-  echo $host > /var/webbynode/mapping/$app_name.conf
-  
-  echo "  => Removing vHost for $app_dns"
-  rm $PHD_VIRTUALHOSTS/$app_dns
-  
-  echo ""
+if [[ -f /var/webbynode/mappings/$app_name.conf ]]; then
+  app_dns=$(cat /var/webbynode/mappings/$app_name.conf)
+  if [[ ! "$app_dns" = "$host" ]]; then
+    echo "Application dns entry changed from $app_dns to $host"
+    echo "  => Fixing mapping"
+    rm /var/webbynode/mappings/$app_name.conf
+    
+    echo "  => Removing vHost for $app_dns"
+    rm $PHD_VIRTUALHOSTS/$app_dns
+    
+    echo ""
+  fi
 fi
 
 echo "Deploying application $app_name as $host..."
@@ -145,6 +144,16 @@ restart_webserver() {
 if [ -f "$dir/.webbynode/engine" ]; then
   app_engine=`cat $dir/.webbynode/engine`
 fi
+
+if [[ -f "$dir/.webbynode/config" ]]; then
+  vars=`cat $dir/.webbynode/config` 
+  eval $vars
+  if [ ! -z "$DNS_ALIAS" ]; then
+    echo "  => DNS Alias: $DNS_ALIAS"
+  fi
+fi
+
+echo ""
 
 if [[ ! -z "$app_engine" ]]; then
   if [[ ! -f "$PHD_ROOT/scripts/$app_engine.sh" ]]; then
