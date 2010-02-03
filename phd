@@ -141,26 +141,19 @@ restart_webserver() {
   fi
 }
 
-if [ -f "$dir/.webbynode/engine" ]; then
-  app_engine=`cat $dir/.webbynode/engine`
-fi
-
-if [[ -f "$dir/.webbynode/config" ]]; then
-  vars=`cat $dir/.webbynode/config` 
+if [[ -f "$dir/.webbynode/settings" ]]; then
+  vars=`cat $dir/.webbynode/settings` 
   eval $vars
-  if [ ! -z "$DNS_ALIAS" ]; then
-    echo "  => DNS Alias: $DNS_ALIAS"
-  fi
 fi
 
 echo ""
 
-if [[ ! -z "$app_engine" ]]; then
-  if [[ ! -f "$PHD_ROOT/scripts/$app_engine.sh" ]]; then
-    echo "Missing support for engine: $app_engine. Aborting."
+if [[ ! -z "$engine" ]]; then
+  if [[ ! -f "$PHD_ROOT/scripts/$engine.sh" ]]; then
+    echo "Missing support for engine: $engine. Aborting."
     exit
   else
-    . $PHD_ROOT/scripts/$app_engine.sh
+    . $PHD_ROOT/scripts/$engine.sh
   fi
 else
   if [[ -d "$dir/app" && -d "$dir/app/controllers" && -f "$dir/config/environment.rb" ]]; then

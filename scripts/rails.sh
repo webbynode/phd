@@ -1,14 +1,14 @@
 if [[ "$WEB_SERVER" == "apache" ]]; then
   PHD_VIRTUALHOST_TEXT='<VirtualHost *:80>
     ServerName $host
-    ServerAlias $DNS_ALIAS
+    ServerAlias $dns_alias
     DocumentRoot $dir/public
     PassengerAppRoot $dir
   </VirtualHost>'
 else
   PHD_VIRTUALHOST_TEXT='server {
       listen 80;
-      server_name $host $DNS_ALIAS;
+      server_name $host $dns_alias;
       root $dir/public;
       passenger_enabled on;
   }'
