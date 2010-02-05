@@ -36,8 +36,7 @@ fi
 
 cd $dir
 echo "  => Bundling gems..."
-#sudo RAILS_ENV=production rake gems:install > /var/log/phd/gems_install.log 2>&1
-sudo bundle install
+sudo bundle install > /var/log/phd/bundler.log 2>&1
 
 echo "  => Migrating database..."
 RAILS_ENV=production rake db:migrate > /var/log/phd/db_migrate.log 2>&1
