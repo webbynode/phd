@@ -10,7 +10,7 @@ if [[ "$WEB_SERVER" == "apache" ]]; then
 
     echo "  => Installing dependencies, this can take a few minutes..."
     
-    sudo apt-get -y -q install php5 php5-cli libapache2-mod-php5 libapache2-mod-auth-mysql php5-mysql php5-pqsql
+    sudo apt-get -y -q install php5-cgi php5-mysql php5-curl php5-gd php5-idn php-pear php5-imagick php5-imap php5-mcrypt php5-memcache php5-mhash php5-ming php5-pspell php5-recode php5-snmp php5-sqlite php5-tidy php5-xmlrpc php5-xsl libapache2-mod-php5 libapache2-mod-auth-mysql php5-mysql php5-pgsql
   fi
   
 else
@@ -35,7 +35,7 @@ else
     echo "Adding PHP support to nginx..."
 
     echo "  => Installing dependencies, this can take a few minutes..."
-    sudo apt-get -y -q install php5-cgi php5-mysql php5-curl php5-gd php5-idn php-pear php5-imagick php5-imap php5-mcrypt php5-memcache php5-mhash php5-ming php5-pspell php5-recode php5-snmp php5-sqlite php5-tidy php5-xmlrpc php5-xsl lighttpd
+    sudo apt-get -y -q install php5-cli php5-cgi php5-mysql php5-pgsql php5-curl php5-gd php5-idn php-pear php5-imagick php5-imap php5-mcrypt php5-memcache php5-mhash php5-ming php5-pspell php5-recode php5-snmp php5-sqlite php5-tidy php5-xmlrpc php5-xsl lighttpd
 
     sudo /etc/init.d/lighttpd stop > /dev/null 2>&1
     sudo update-rc.d -f lighttpd remove
