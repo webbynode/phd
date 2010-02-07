@@ -45,8 +45,9 @@ else
 
     sudo echo "#\!/bin/sh -e
 /usr/bin/spawn-fcgi -a 127.0.0.1 -p 9000 -u www-data -g www-data -f /usr/bin/php5-cgi -P /var/run/fastcgi-php.pid
-exit 0" > /etc/rc.local
-    sudo chmod +x /etc/rc.local
+" > /etc/init.d/fcgi-php
+    sudo chmod +x /etc/fcgi-php
+    sudo update-rc.d fcgi-php start 51 S
   
     echo "Done!"
     echo ""
