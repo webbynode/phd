@@ -43,11 +43,13 @@ else
     echo "  => Spawning fastcgi..."
     sudo /usr/bin/spawn-fcgi -a 127.0.0.1 -p 9000 -u www-data -g www-data -f /usr/bin/php5-cgi -P /var/run/fastcgi-php.pid
 
-    sudo echo "#\!/bin/sh -e
+    echo "#\!/bin/sh -e
 /usr/bin/spawn-fcgi -a 127.0.0.1 -p 9000 -u www-data -g www-data -f /usr/bin/php5-cgi -P /var/run/fastcgi-php.pid
-" > /etc/init.d/fcgi-php
-    sudo chmod +x /etc/fcgi-php
-    sudo update-rc.d fcgi-php start 51 S
+" > /tmp/fcgi-php
+
+    sudo mv /tmp/fcgi-php /etc/init.d/fcgi-php
+    sudo chmod +x /etc/init.d/fcgi-php
+    sudo update-rc.d fcgi-php start 51 S .
   
     echo "Done!"
     echo ""
