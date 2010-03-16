@@ -23,50 +23,76 @@ else
   if [[ ! -x "/usr/local/bin/node" ]]; then
     echo "Adding node.js support to nginx..."
 
-    echo "  => Installing dependencies, this can take a few minutes..."
+    echo ""
+    echo "  => Installing dependencies, this will take some minutes to complete..."
+    echo ""
     
-    apt-get -y -q install flex bison
+    apt-get -y -q install flex bison monit
 
     cd /tmp
-    http://mmonit.com/monit/dist/monit-5.1.1.tar.gz
+    wget http://mmonit.com/monit/dist/monit-5.1.1.tar.gz
     tar -vzxf monit-5.1.1.tar.gz
+    rm -fR /tmp/monit-5.1.1.tar.gz
 
     cd /tmp/monit-5.1.1
+    ./configure
     make
     sudo make install
     sudo mkdir -p /etc/monit/services
     sudo chown -R git:www-data /etc/monit/services
     
+    monit=`which monit`
+    if [[ -z "$monit" ]]; then
+      echo ""
+      echo "     Error installing monit, aborting."
+      echo ""
+    else
+      cd /tmp
+      rm -fR /tmp/monit-5.1.1
+    fi
+        
     sudo echo "set daemon 30
 include /etc/monit/services/*
 
 check system nodejs
 set httpd port 2812
   allow admin:hello
-" > /etc/monit/monitrc
+" > /etc/monitrc
     sudo chmod 700 /etc/monitrc
+    sudo cp /etc/monitrc /etc/monit/monitrc
     sudo sed -e 's|startup=0|startup=1|' -i /etc/default/monit
     sudo cp /usr/local/bin/monit /usr/sbin
     
     echo "  => Starting monit"
     sudo /etc/init.d/monit start
     
+    # wget ftp://ftp.gnu.org/pub/gnu/gnutls/gnutls-2.8.6.tar.bz2
+    # tar -jxvf gnutls-2.8.6.tar.bz2
+    #   
+    # cd /tmp/gnutls-2.8.6
+    # ./configure
+    # make
+    # make install
+
     cd /tmp
     sudo apt-get -y -q install libgcrypt-dev
-    wget ftp://ftp.gnu.org/pub/gnu/gnutls/gnutls-2.8.6.tar.bz2
-    tar -jxvf gnutls-2.8.6.tar.bz2
-  
-    cd /tmp/gnutls-2.8.6
-    ./configure
-    make
-    make install
-
     git clone git://github.com/ry/node.git
 
     cd /tmp/node
     ./configure
     make
     make install
+    
+    node=`which node`
+    if [[ -z "$node" ]]; then
+      echo ""
+      echo "     Error installing node.js, aborting."
+      echo ""
+      exit 1
+    else
+      rm -fR /tmp/node
+    fi
+    
   fi
 
 fi
@@ -97,4 +123,5 @@ sudo chown -R git:www-data * > /var/log/phd/chown.log 2>&1
 cd -
 
 sudo monit restart $host
-#restart_webserver 0
+
+restart_webserver 0
