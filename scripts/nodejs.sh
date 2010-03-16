@@ -20,7 +20,9 @@ else
       }
   }'
 
+  installing=0
   if [[ ! -x "/usr/local/bin/node" ]]; then
+    installing=1
     echo "Adding node.js support to nginx..."
 
     echo ""
@@ -105,7 +107,8 @@ sudo config_app_db $app_name > /var/log/phd/config_db.log 2>&1
 
 cd $dir
 
-script=`ls -1 *.js|tail -1`
+#script=`ls -1 *.js|tail -1`
+script="index.js"
 echo "  => Configuring monit..."
 sudo rm /etc/monit/services/$app_name > /dev/null 2>&1
 sudo echo "check host $host with address 127.0.0.1
@@ -117,11 +120,13 @@ if failed port 8000 protocol HTTP
     then restart" > /etc/monit/services/$app_name
     
 echo "  => Starting app..."
+sudo /etc/init.d/monit restart
 sudo monit start $app_name
 
 sudo chown -R git:www-data * > /var/log/phd/chown.log 2>&1
 cd -
 
 sudo monit restart $host
-
-restart_webserver 0
+if [ "$installing" == "1" ]; then
+  restart_webserver 0
+fi
