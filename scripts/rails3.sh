@@ -14,7 +14,7 @@ else
   }'
 fi
 
-echo "Configuring Rails application..."
+echo "Configuring Rails 3 application..."
 
 configure_vhost
 already_existed=$?
@@ -36,7 +36,7 @@ fi
 
 cd $dir
 echo "  => Bundling gems..."
-unset GIT_DIR && bundle install > /var/log/phd/bundler.log 2>&1
+unset GIT_DIR && bundle install --without test development > /var/log/phd/bundler.log 2>&1
 
 echo "  => Migrating database..."
 RAILS_ENV=production rake db:migrate > /var/log/phd/db_migrate.log 2>&1
