@@ -37,6 +37,22 @@ fi
 cd $dir
 echo "  => Bundling gems..."
 unset GIT_DIR && bundle install --without test development > /var/log/phd/bundler.log 2>&1
+sqlite=`bundle show | grep sqlite3-ruby | wc -l`
+if [ $sqlite -gt 0 ]; then
+  echo ""
+  echo "---------------------"
+  echo "    W A R N I N G "
+  echo "---------------------"
+  echo ""
+  echo "It seems that you have sqlite3-ruby gem listed in your Gemfile. Please visit the URL:"
+  echo ""
+  echo "   http://guides.webbynode.com/articles/rapidapps/rails3warning.html"
+  echo ""
+  echo "If you receive the following error while starting your application:"
+  echo ""
+  echo "   Cannot spawn application '/var/rails/your_app': The spawn server has exited unexpectedly."
+  echo ""
+fi
 
 echo "  => Migrating database..."
 RAILS_ENV=production rake db:migrate > /var/log/phd/db_migrate.log 2>&1
