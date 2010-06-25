@@ -37,8 +37,10 @@ fi
 cd $dir
 echo "  => Bundling gems..."
 unset GIT_DIR && bundle install --without test development > /var/log/phd/bundler.log 2>&1
-sqlite=`bundle show | grep sqlite3-ruby | wc -l`
-if [ $sqlite -gt 0 ]; then
+
+ruby -e "require 'rubygems'; require 'bundler'" -e "sqlite3 = Bundler.definition.dependencies.select { |d| d.name == 'sqlite3-ruby' }.first; exit(0) unless sqlite3; groups = sqlite3.groups - [:test, :development]; if groups.any?; exit(1); else; exit(0); end"
+
+if [ $? -eq 1 ]; then
   echo ""
   echo "---------------------"
   echo "    W A R N I N G "
