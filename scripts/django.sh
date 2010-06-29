@@ -5,15 +5,17 @@ fi
 
 if [[ -z "$django_username" ]]; then
   echo Missing django_username setting, halting installation...
+  exit 100
 fi
 
 if [[ -z "$django_email" ]]; then
   echo Missing django_email setting, halting installation...
+  exit 101
 fi
 
-if [[ ! -f "$dir/settings.template.py"]]; then 
+if [[ ! -f "$dir/settings.template.py" ]]; then 
   echo Missing settings.template.py, halting...
-  exit 1
+  exit 102
 fi
 
 if [[ "$WEB_SERVER" == "apache" ]]; then
