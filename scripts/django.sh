@@ -60,10 +60,8 @@ sudo config_app_db $app_name > /var/log/phd/config_db.log 2>&1
 old_dir=`pwd`
 
 cd $dir
-if [[ ! -f "$dir/settings.py" ]]; then
-  echo "  => Configuring server side settings.py..."
-  /var/webbynode/templates/django/settings.py.sh $app_name
-fi
+echo "  => Configuring server side settings.py..."
+/var/webbynode/templates/django/settings.py.sh $app_name
 
 echo "  => Migrating database..."
 python manage.py syncdb --noinput
