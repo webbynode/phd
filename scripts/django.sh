@@ -47,6 +47,7 @@ EOS
     WSGIScriptAlias / $dir/apache/django.wsgi
   </VirtualHost>'
 else
+  echo "not supported yet"
 fi
 
 if [[ ! -f "$dir/settings.py" ]]; then
