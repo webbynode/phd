@@ -30,7 +30,7 @@ if [[ "$WEB_SERVER" == "apache" ]]; then
   # for mysql
   install_if_needed python-mysqldb
   
-  mkdir -p $dir/apache/django.wsgi
+  mkdir -p $dir/apache
   echo <<EOS > $dir/apache/django.wsgi
 import os
 import sys
@@ -50,6 +50,9 @@ else
   echo "not supported yet"
 fi
 
+old_dir=`pwd`
+
+cd $dir
 if [[ ! -f "$dir/settings.py" ]]; then
   echo "  => Configuring server side settings.py..."
   /var/webbynode/templates/django/settings.py.sh $app_name
@@ -57,3 +60,5 @@ fi
 
 echo "Please provide your superuser password below, if asked."
 python manage.py syncdb --username=$django_username --email=$django_email
+
+cd $old_dir
