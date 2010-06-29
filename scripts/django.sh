@@ -3,16 +3,6 @@ if [[ -f "$dir/.webbynode/settings" ]]; then
   eval $vars
 fi
 
-if [[ -z "$django_username" ]]; then
-  echo Missing django_username setting, halting installation...
-  exit 100
-fi
-
-if [[ -z "$django_email" ]]; then
-  echo Missing django_email setting, halting installation...
-  exit 101
-fi
-
 if [[ ! -f "$dir/settings.template.py" ]]; then 
   echo Missing settings.template.py, halting...
   exit 102
@@ -57,6 +47,16 @@ echo "Configuring Django application..."
 configure_vhost
 already_existed=$?
 
+if [[ -z "$django_username" ]]; then
+  django_username = 'admin'
+  echo "     WARN: Missing django_username setting, assuming 'admin'"
+fi
+
+if [[ -z "$django_email" ]]; then
+  django_email = 'admin@example.org'
+  echo "     WARN: Missing django_email setting, assuming 'admin@example.org'"
+fi
+
 echo "  => Configuring database..."
 sudo config_app_db $app_name > /var/log/phd/config_db.log 2>&1
 
@@ -64,14 +64,13 @@ old_dir=`pwd`
 
 cd $dir
 echo "  => Configuring server side settings.py..."
-/var/webbynode/templates/django/settings.py.sh $app_name
+/var/webbynode/django/settings.py.sh $app_name
 
 echo "  => Migrating database..."
 python manage.py syncdb --noinput
 
 echo "  => Creating Django superuser..."
-#echo "     Please provide your superuser password below, if asked."
-python manage.py createsuperuser --username=$django_username --email=$django_email 2>/dev/null
+PYTHONPATH=$dir python /var/webbynode/django/create_superuser.py $django_username "$django_email"
 
 cd $old_dir
 
