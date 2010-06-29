@@ -70,7 +70,11 @@ echo "  => Migrating database..."
 python manage.py syncdb --noinput
 
 echo "  => Creating Django superuser..."
-PYTHONPATH=$dir python /var/webbynode/django/create_superuser.py $django_username "$django_email"
+result=`PYTHONPATH=$dir python /var/webbynode/django/create_superuser.py $django_username "$django_email" 2>&1`
+
+if [[ result =~ /duplicate key value violates unique constraint "auth_user_username_key"/ ]]; then
+  echo "     Already created."
+fi
 
 cd $old_dir
 
