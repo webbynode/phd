@@ -66,12 +66,12 @@ if [[ ! -f "$dir/settings.py" ]]; then
   /var/webbynode/templates/django/settings.py.sh $app_name
 fi
 
-echo "  => Creating Django superuser..."
-echo "     Please provide your superuser password below, if asked."
-python manage.py createsuperuser --username=$django_username --email=$django_email
-
 echo "  => Migrating database..."
-python manage.py syncdb
+python manage.py syncdb --noinput
+
+echo "  => Creating Django superuser..."
+#echo "     Please provide your superuser password below, if asked."
+python manage.py createsuperuser --username=$django_username --email=$django_email --noinput
 
 cd $old_dir
 
