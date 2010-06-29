@@ -31,14 +31,14 @@ if [[ "$WEB_SERVER" == "apache" ]]; then
   install_if_needed python-mysqldb
   
   mkdir -p $dir/apache
-  WSGI_FILE="import os
+  echo "import os
 import sys
 
 os.environ['DJANGO_SETTINGS_MODULE'] = '$app_name.settings'
 
 import django.core.handlers.wsgi
-application = django.core.handlers.wsgi.WSGIHandler()"
-  echo $WSGI_FILE > $dir/apache/django.wsgi
+sys.path.append('$dir')
+application = django.core.handlers.wsgi.WSGIHandler()" > $dir/apache/django.wsgi
 
   PHD_VIRTUALHOST_TEXT='<VirtualHost *:80>
     ServerName $host
