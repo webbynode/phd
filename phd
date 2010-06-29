@@ -88,6 +88,18 @@ fi
 
 echo "Deploying application $app_name as $host..."
 
+install_if_needed() {
+  dpkg -s $1 >/dev/null 2>&1
+  if [ $? -eq 1 ]; then
+    echo Installing $1...
+    sudo apt-get install -y -q $1
+    
+    if [ ! -z "$2" ]; then
+      `$2`
+    fi
+  fi
+}
+
 configure_apache_vhost() {
   if [[ -f "$PHD_VIRTUALHOSTS/$host" ]]; then
 		echo '     Already configured!'
