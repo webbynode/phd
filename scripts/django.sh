@@ -43,6 +43,9 @@ application = django.core.handlers.wsgi.WSGIHandler()" > $dir/apache/django.wsgi
   PHD_VIRTUALHOST_TEXT='<VirtualHost *:80>
     ServerName $host
     DocumentRoot $dir
+
+    Alias /media/ /usr/share/pyshared/django/contrib/admin/media/
+
     WSGIScriptAlias / $dir/apache/django.wsgi
   </VirtualHost>'
 else
@@ -68,7 +71,7 @@ python manage.py syncdb --noinput
 
 echo "  => Creating Django superuser..."
 #echo "     Please provide your superuser password below, if asked."
-python manage.py createsuperuser --username=$django_username --email=$django_email --noinput > /var/log/phd/superuser.log 2>&1
+python manage.py createsuperuser --username=$django_username --email=$django_email 2>/dev/null
 
 cd $old_dir
 
