@@ -48,12 +48,12 @@ configure_vhost
 already_existed=$?
 
 if [[ -z "$django_username" ]]; then
-  django_username = 'admin'
+  django_username='admin'
   echo "     WARN: Missing django_username setting, assuming 'admin'"
 fi
 
 if [[ -z "$django_email" ]]; then
-  django_email = 'admin@example.org'
+  django_email='admin@example.org'
   echo "     WARN: Missing django_email setting, assuming 'admin@example.org'"
 fi
 
