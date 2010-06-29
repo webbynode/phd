@@ -50,6 +50,14 @@ else
   echo "not supported yet"
 fi
 
+echo "Configuring Django application..."
+
+configure_vhost
+already_existed=$?
+
+echo "  => Configuring database..."
+sudo config_app_db $app_name > /var/log/phd/config_db.log 2>&1
+
 old_dir=`pwd`
 
 cd $dir
@@ -58,8 +66,13 @@ if [[ ! -f "$dir/settings.py" ]]; then
   /var/webbynode/templates/django/settings.py.sh $app_name
 fi
 
-echo "Please provide your superuser password below, if asked."
+echo "  => Creating Django superuser..."
+echo "     Please provide your superuser password below, if asked."
 python manage.py createsuperuser --username=$django_username --email=$django_email
+
+echo "  => Migrating database..."
 python manage.py syncdb
 
 cd $old_dir
+
+restart_webserver 0
