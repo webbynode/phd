@@ -37,7 +37,7 @@ import sys
 os.environ['DJANGO_SETTINGS_MODULE'] = '$app_name.settings'
 
 import django.core.handlers.wsgi
-sys.path.append('$dir')
+sys.path.append('$HOME')
 application = django.core.handlers.wsgi.WSGIHandler()" > $dir/apache/django.wsgi
 
   PHD_VIRTUALHOST_TEXT='<VirtualHost *:80>
@@ -70,7 +70,7 @@ python manage.py syncdb --noinput
 
 echo "  => Creating Django superuser..."
 #echo "     Please provide your superuser password below, if asked."
-python manage.py createsuperuser --username=$django_username --email=$django_email --noinput
+python manage.py createsuperuser --username=$django_username --email=$django_email --noinput > /var/log/phd/superuser.log 2>&1
 
 cd $old_dir
 
