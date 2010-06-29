@@ -59,6 +59,7 @@ if [[ ! -f "$dir/settings.py" ]]; then
 fi
 
 echo "Please provide your superuser password below, if asked."
-python manage.py syncdb --username=$django_username --email=$django_email
+python manage.py createsuperuser --username=$django_username --email=$django_email
+python manage.py syncdb
 
 cd $old_dir
