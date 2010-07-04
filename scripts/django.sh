@@ -55,11 +55,11 @@ else
       location / {
         # host and port to fastcgi server
         fastcgi_pass 127.0.0.1:3000;
-        fastcgi_param PATH_INFO $fastcgi_script_name;
-        fastcgi_param REQUEST_METHOD $request_method;
-        fastcgi_param QUERY_STRING $query_string;
-        fastcgi_param CONTENT_TYPE $content_type;
-        fastcgi_param CONTENT_LENGTH $content_length;
+        fastcgi_param PATH_INFO \$fastcgi_script_name;
+        fastcgi_param REQUEST_METHOD \$request_method;
+        fastcgi_param QUERY_STRING \$query_string;
+        fastcgi_param CONTENT_TYPE \$content_type;
+        fastcgi_param CONTENT_LENGTH \$content_length;
         fastcgi_pass_header Authorization;
         fastcgi_intercept_errors off;
       }
