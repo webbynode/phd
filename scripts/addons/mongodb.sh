@@ -13,6 +13,6 @@ if [ $? -eq 1 ]; then
   fi
   sudo apt-get update
 
-  install_if_needed mongodb-stable
+  install_if_needed mongodb-stable >/var/log/phd/mongodb-install.log 2>&1
 fi
 
