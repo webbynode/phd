@@ -67,6 +67,8 @@ else
   
   if [[ ! -f "/etc/init.d/fastcgi" ]]; then
     echo "  => Configuring Django fastcgi support..."
+    install_if_needed python-flup
+
     mkdir $HOME/run
     sudo echo "#! /bin/sh
 ### BEGIN INIT INFO
@@ -125,7 +127,7 @@ d_start()
                        host=\$HOST port=\$PORT pidfile=\$RUNFILES_PATH/\$SITE.pid
             chmod 400 \$RUNFILES_PATH/\$SITE.pid
         fi
-        let \"PORT = \$PORT + 1\"
+        PORT=\$(( \$PORT + 1 ))
     done
 }
 
@@ -177,7 +179,7 @@ exit 0" > /tmp/fastcgi
 
     sudo mv /tmp/fastcgi /etc/init.d/fastcgi
     sudo chmod +x /etc/init.d/fastcgi
-    sudo update-rc.d /etc/init.d/fastcgi defaults
+    sudo update-rc.d fastcgi defaults
   fi
 fi
 
