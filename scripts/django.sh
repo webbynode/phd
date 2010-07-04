@@ -173,8 +173,9 @@ case \"\$ACTION\" in
         ;;
 esac
 
-exit 0" > /etc/init.d/fastcgi
+exit 0" > /tmp/fastcgi
 
+    sudo mv /tmp/fastcgi /etc/init.d/fastcgi
     sudo chmod +x /etc/init.d/fastcgi
     sudo update-rc.d /etc/init.d/fastcgi defaults
   fi
