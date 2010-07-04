@@ -164,6 +164,20 @@ fi
 
 echo ""
 
+if [[ ! -z "addons" ]]; then
+  echo "  => Checking for addons..."
+  
+  for addon in ${addons[@]}; do
+    if [[ ! -f "$PHD_ROOT/scripts/addons/$addon.sh" ]]; then
+      echo "WARNING: Missing support for addon: $addon. Skipping"
+    else
+      . $PHD_ROOT/scripts/addons/$addon.sh
+    fi
+  done
+  
+  echo ""
+fi
+
 if [[ ! -z "$engine" ]]; then
   if [[ ! -f "$PHD_ROOT/scripts/$engine.sh" ]]; then
     echo "Missing support for engine: $engine. Aborting."
@@ -179,16 +193,6 @@ else
   else
     echo "WARNING: Didn't detect what application engine you're using."
   fi
-fi
-
-if [[ ! -z "addons" ]]; then
-  for addon in ${addons[@]}; do
-    if [[ ! -f "$PHD_ROOT/scripts/addons/$addon.sh" ]]; then
-      echo "WARNING: Missing support for addon: $addon. Skipping"
-    else
-      . $PHD_ROOT/scripts/addons/$addon.sh
-    fi
-  done
 fi
 
 echo ""
