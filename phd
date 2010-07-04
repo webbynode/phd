@@ -165,7 +165,7 @@ fi
 echo ""
 
 if [[ ! -z "addons" ]]; then
-  echo "  => Checking for addons..."
+  echo "Configuring addons..."
   
   for addon in ${addons[@]}; do
     if [[ ! -f "$PHD_ROOT/scripts/addons/$addon.sh" ]]; then
