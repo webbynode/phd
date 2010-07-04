@@ -63,8 +63,11 @@ else
       }
   }'
   
+  fastcgi_install=n
   if [[ ! -f "/etc/init.d/fastcgi" ]]; then
-    echo "  => Configuring Django fastcgi support..."
+    fastcgi_install=y
+    
+    echo "Configuring Django fastcgi support..."
     install_if_needed python-flup
 
     mkdir $HOME/run
@@ -179,6 +182,8 @@ exit 0" > /tmp/fastcgi
     sudo chmod +x /etc/init.d/fastcgi
     sudo update-rc.d fastcgi defaults
   fi
+  
+  echo ""
 fi
 
 echo "Configuring Django application..."
@@ -220,6 +225,10 @@ cd $old_dir
 if [[ "$WEB_SERVER" == "apache" ]]; then
   restart_webserver 0
 else
+  if [[ "$fastcgi_install" == "y" ]]; then
+    restart_webserver 0
+  fi
+
   echo ""
   sudo /etc/init.d/fastcgi restart
 fi
