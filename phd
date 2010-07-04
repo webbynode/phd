@@ -88,6 +88,10 @@ fi
 
 echo "Deploying application $app_name as $host..."
 
+check_installed() {
+  dpkg -s $1 >/dev/null 2>&1
+}
+
 install_if_needed() {
   dpkg -s $1 >/dev/null 2>&1
   if [ $? -eq 1 ]; then
@@ -175,6 +179,16 @@ else
   else
     echo "WARNING: Didn't detect what application engine you're using."
   fi
+fi
+
+if [[ ! -z "addons" ]]; then
+  for addon in ${addons[@]}; do
+    if [[ ! -f "$PHD_ROOT/scripts/addons/$addon.sh" ]]; then
+      echo "WARNING: Missing support for addon: $addon. Skipping"
+    else
+      . $PHD_ROOT/scripts/addons/$addon.sh
+    fi
+  done
 fi
 
 echo ""
