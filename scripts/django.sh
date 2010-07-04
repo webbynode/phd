@@ -49,7 +49,7 @@ else
       passenger_enabled on;
       
       location /media {
-        root /usr/share/pyshared/django/contrib/admin/media/
+        root /usr/share/pyshared/django/contrib/admin/media/;
       }
       
       location / {
