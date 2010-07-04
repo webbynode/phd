@@ -95,7 +95,7 @@ SITES_PATH=$HOME
 RUNFILES_PATH=\$SITES_PATH/run
 HOST=127.0.0.1
 PORT_START=3000
-RUN_AS=www-data
+RUN_AS=git
 FCGI_METHOD=threaded
 #### DO NOT CHANGE ANYTHING AFTER THIS LINE!
 
@@ -219,4 +219,9 @@ fi
 
 cd $old_dir
 
-restart_webserver 0
+if [[ "$WEB_SERVER" == "apache" ]]; then
+  restart_webserver 0
+else
+  echo "Restarting fastcgi..."
+  sudo /etc/init.d/fastcgi restart
+fi
