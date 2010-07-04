@@ -174,8 +174,9 @@ esac
 
 exit 0" > /etc/init.d/fastcgi
 
-  sudo chmod +x /etc/init.d/fastcgi
-  sudo update-rc.d /etc/init.d/fastcgi defaults
+    sudo chmod +x /etc/init.d/fastcgi
+    sudo update-rc.d /etc/init.d/fastcgi defaults
+  fi
 fi
 
 echo "Configuring Django application..."
