@@ -222,6 +222,6 @@ cd $old_dir
 if [[ "$WEB_SERVER" == "apache" ]]; then
   restart_webserver 0
 else
-  echo "Restarting fastcgi..."
+  echo ""
   sudo /etc/init.d/fastcgi restart
 fi
