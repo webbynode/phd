@@ -65,7 +65,8 @@ else
       }
   }'
   
-  if [[ -f "/etc/init.d/fastcgi" ]]; then
+  if [[ ! -f "/etc/init.d/fastcgi" ]]; then
+    echo "  => Configuring Django fastcgi support..."
     mkdir $HOME/run
     sudo echo "#! /bin/sh
 ### BEGIN INIT INFO
