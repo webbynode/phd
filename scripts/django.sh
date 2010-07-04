@@ -70,7 +70,9 @@ else
     echo "Configuring Django fastcgi support..."
     install_if_needed python-flup
 
-    mkdir $HOME/run
+    mkdir -p /var/webbynode/django/run
+    chown -R git:www-data /var/webbynode/django/run
+    
     sudo echo "#! /bin/sh
 ### BEGIN INIT INFO
 # Provides:          FastCGI servers for Django
@@ -93,7 +95,7 @@ else
 #### SERVER SPECIFIC CONFIGURATION
 DJANGO_SITES=\"$app_name\"
 SITES_PATH=$HOME
-RUNFILES_PATH=\$SITES_PATH/run
+RUNFILES_PATH=/var/webbynode/django/run
 HOST=127.0.0.1
 PORT_START=3000
 RUN_AS=git
