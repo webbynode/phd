@@ -45,11 +45,9 @@ else
   PHD_VIRTUALHOST_TEXT='server {
       listen 80;
       server_name $host $dns_alias;
-      root $dir/public;
-      passenger_enabled on;
       
       location /media {
-        root /usr/share/pyshared/django/contrib/admin/media/;
+        root /usr/share/pyshared/django/contrib/admin;
       }
       
       location / {
