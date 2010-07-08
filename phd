@@ -110,7 +110,7 @@ add_on_wait() {
 check_installed() {
   output=`dpkg -s $1`
   if [ $? == 0 ]; then
-    output=`dpkg -s $1 | grep Status: | grep installed`
+    output=`dpkg -s $1 | grep Status: | grep " installed"`
   fi
 }
 
