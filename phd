@@ -12,7 +12,7 @@ fi
 PHD_ROOT=/var/webbynode/phd
 LOG_DIR=/var/webbynode/log
 
-if [ ! -d /var/log/webbynode ]; then
+if [ ! -d $LOG_DIR ]; then
   sudo mkdir -p $LOG_DIR
   sudo chown -R git:www-data $LOG_DIR
 fi
