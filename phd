@@ -108,7 +108,10 @@ add_on_wait() {
 }
 
 check_installed() {
-  dpkg -s $1 >/dev/null 2>&1
+  output=`dpkg -s $1`
+  if [ $? == 0 ]; then
+    output=`dpkg -s $1 | grep Status: | grep installed`
+  fi
 }
 
 install_if_needed() {
