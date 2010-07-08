@@ -10,6 +10,12 @@ if [[ -z "$1" ]]; then
 fi
 
 PHD_ROOT=/var/webbynode/phd
+LOG_DIR=/var/log/webbynode
+
+if [ ! -d /var/log/webbynode ]; then
+  sudo mkdir -p $LOG_DIR
+  sudo chown -R git:www-data $LOG_DIR
+fi
 
 dir=$(dirname $1)
 host=$3
@@ -87,6 +93,19 @@ if [[ -f /var/webbynode/mappings/$app_name.conf ]]; then
 fi
 
 echo "Deploying application $app_name as $host..."
+
+add_on() {
+  echo "  => Installing addon $1"
+}
+
+add_on_status() {
+  echo "     $1..."  
+}
+
+add_on_wait() {
+  echo "     $1..."
+  echo "     This may take a few minutes, please wait..."
+}
 
 check_installed() {
   dpkg -s $1 >/dev/null 2>&1
