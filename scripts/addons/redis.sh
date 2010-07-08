@@ -7,7 +7,7 @@ if [ ! -f /etc/init.d/redis ]; then
   cd /usr/src
   add_on_status "Downloading redis"
   sudo wget --quiet http://redis.googlecode.com/files/redis-1.2.6.tar.gz >> $LOG_DIR/redis.log 2>&1
-  sudo tar vzxf redis-1.2.6.tar.gz
+  sudo tar vzxf redis-1.2.6.tar.gz >> $LOG_DIR/redis.log 2>&1
   sudo rm redis-1.2.6.tar.gz
   cd redis-*
 
@@ -24,5 +24,5 @@ if [ ! -f /etc/init.d/redis ]; then
   sudo bash -c 'echo "nohup /usr/bin/redis-server /etc/redis.conf | /usr/sbin/cronolog /var/log/redis/redis.%Y-%m-%d.log 2>&1 &" > /etc/init.d/redis'
 
   add_on_status "Starting redis"
-  sudo /etc/init.d/redis >> $LOG_DIR/redis.log 2>&1gi
+  sudo /etc/init.d/redis >> $LOG_DIR/redis.log 2>&1
 fi
