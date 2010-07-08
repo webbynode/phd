@@ -23,7 +23,7 @@ if [[ ! -d "$dir/public" ]]; then
 fi
 
 echo "  => Configuring database..."
-config_app_db $app_name > /var/log/phd/config_db.log 2>&1
+config_app_db $app_name > $LOG_DIR/config_db.log 2>&1
 
 echo ""
 restart_webserver $already_existed

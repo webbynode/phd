@@ -204,7 +204,7 @@ if [[ -z "$django_email" ]]; then
 fi
 
 echo "  => Configuring database..."
-sudo config_app_db $app_name > /var/log/phd/config_db.log 2>&1
+sudo config_app_db $app_name > $LOG_DIR/config_db.log 2>&1
 
 old_dir=`pwd`
 

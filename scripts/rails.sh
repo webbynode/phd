@@ -20,7 +20,7 @@ configure_vhost
 already_existed=$?
 
 echo "  => Configuring database..."
-sudo config_app_db $app_name > /var/log/phd/config_db.log 2>&1
+sudo config_app_db $app_name > $LOG_DIR/config_db.log 2>&1
 
 # checks the db/username
 name=$app_name
@@ -36,12 +36,12 @@ fi
 
 cd $dir
 echo "  => Installing missing gems..."
-sudo RAILS_ENV=production rake gems:install > /var/log/phd/gems_install.log 2>&1
+sudo RAILS_ENV=production rake gems:install > $LOG_DIR/gems_install.log 2>&1
 
 echo "  => Migrating database..."
-RAILS_ENV=production rake db:migrate > /var/log/phd/db_migrate.log 2>&1
+RAILS_ENV=production rake db:migrate > $LOG_DIR/db_migrate.log 2>&1
 
-sudo chown -R git:www-data * > /var/log/phd/chown.log 2>&1
+sudo chown -R git:www-data * > $LOG_DIR/chown.log 2>&1
 cd -
 
 restart_webserver $already_existed

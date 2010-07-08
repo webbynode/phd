@@ -60,11 +60,11 @@ echo "Configuring PHP application..."
 configure_vhost
 
 echo "  => Configuring database..."
-sudo config_app_db $app_name > /var/log/phd/config_db.log 2>&1
+sudo config_app_db $app_name > $LOG_DIR/config_db.log 2>&1
 
 cd $dir
 
-sudo chown -R git:www-data * > /var/log/phd/chown.log 2>&1
+sudo chown -R git:www-data * > $LOG_DIR/chown.log 2>&1
 cd -
 
 restart_webserver 0

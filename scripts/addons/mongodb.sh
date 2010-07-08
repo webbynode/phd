@@ -13,10 +13,10 @@ if [ $? -eq 1 ]; then
   if [ $? != 0 ]; then
     sudo apt-key adv --keyserver pool.sks-keyservers.net --recv 7F0CEB10
   fi
-  sudo apt-get update >/var/log/phd/mongodb-install.log 2>&1
+  sudo apt-get update >$LOG_DIR/mongodb-install.log 2>&1
 
   add_on_wait "Installing MongoDB"
-  install_if_needed mongodb-stable >>/var/log/phd/mongodb-install.log 2>&1
+  install_if_needed mongodb-stable >>$LOG_DIR/mongodb-install.log 2>&1
   echo ""
 fi
 
