@@ -108,15 +108,20 @@ add_on_wait() {
 }
 
 check_installed() {
-  output=`dpkg -s $1`
+  installed=n
+  output=`dpkg -s $1 2>&1`
   if [ $? == 0 ]; then
     output=`dpkg -s $1 | grep Status: | grep " installed"`
+    if [ $? == 0 ]; then
+      installed=y
+    fi
   fi
 }
 
 install_if_needed() {
   check_installed $1
-  if [ $? -eq 1 ]; then
+  
+  if [ "$installed" == "n" ]; then
     echo Installing $1...
     sudo apt-get install -y -q $1
     

@@ -1,6 +1,6 @@
 check_installed memcached
 
-if [ $? -eq 1 ]; then
+if [ "$installed" == "n" ]; then
   add_on "Memcached"
   
   add_on_wait "Installing Memcached"

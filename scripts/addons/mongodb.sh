@@ -1,6 +1,6 @@
 check_installed mongodb-stable
 
-if [ $? -eq 1 ]; then
+if [ "$installed" == "n" ]; then
   add_on "MongoDB"
 
   # adds 10gen repo to aptitude sources
