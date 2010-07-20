@@ -9,14 +9,18 @@ if [ "$installed" == "n" ]; then
 
   # installs 10gen repo GPG key
   add_on_status "Acquiring 10gen gpg aptitude key"
-  sudo apt-key adv --keyserver keyserver.ubuntu.com --recv 7F0CEB10 >>$LOG_DIR/mongodb-install.log 2>&1
+  sudo apt-key adv --keyserver keyserver.ubuntu.com --recv 7F0CEB10 2>&1 | sed 's/^/     /'
+  #>>$LOG_DIR/mongodb-install.log 2>&1
   if [ $? != 0 ]; then
-    sudo apt-key adv --keyserver pool.sks-keyservers.net --recv 7F0CEB10 >>$LOG_DIR/mongodb-install.log 2>&1
+    sudo apt-key adv --keyserver pool.sks-keyservers.net --recv 7F0CEB10 2>&1 | sed 's/^/     /'
+    #>>$LOG_DIR/mongodb-install.log 2>&1
   fi
-  sudo apt-get update >$LOG_DIR/mongodb-install.log 2>&1
+  sudo apt-get update  2>&1 | sed 's/^/     /'
+  #>$LOG_DIR/mongodb-install.log 2>&1
 
   add_on_wait "Installing MongoDB"
-  install_if_needed mongodb-stable >>$LOG_DIR/mongodb-install.log 2>&1
+  install_if_needed mongodb-stable
+  # >>$LOG_DIR/mongodb-install.log 2>&1
   echo ""
 fi
 

@@ -123,7 +123,7 @@ install_if_needed() {
   
   if [ "$installed" == "n" ]; then
     echo Installing $1...
-    sudo apt-get install -y -q $1
+    sudo apt-get install -y -q $1 2>&1 | sed 's/^/     /'
     
     if [ ! -z "$2" ]; then
       `$2`

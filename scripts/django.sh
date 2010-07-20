@@ -210,10 +210,10 @@ old_dir=`pwd`
 
 cd $dir
 echo "  => Configuring server side settings.py..."
-/var/webbynode/django/settings.py.sh $app_name
+/var/webbynode/django/settings.py.sh $app_name 2>&1 | sed 's/^/     /'
 
 echo "  => Sync'ing database..."
-python manage.py syncdb --noinput
+python manage.py syncdb --noinput 2>&1 | sed 's/^/     /'
 
 echo "  => Creating Django superuser..."
 result=`PYTHONPATH=$dir python /var/webbynode/django/create_superuser.py $django_username "$django_email" 2>&1`
