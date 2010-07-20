@@ -25,4 +25,6 @@ if [ ! -f /etc/init.d/redis ]; then
 
   add_on_status "Starting redis"
   sudo /etc/init.d/redis >> $LOG_DIR/redis.log 2>&1
+  
+  echo ""
 fi

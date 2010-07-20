@@ -9,9 +9,9 @@ if [ "$installed" == "n" ]; then
 
   # installs 10gen repo GPG key
   add_on_status "Acquiring 10gen gpg aptitude key"
-  sudo apt-key adv --keyserver keyserver.ubuntu.com --recv 7F0CEB10
+  sudo apt-key adv --keyserver keyserver.ubuntu.com --recv 7F0CEB10 >>$LOG_DIR/mongodb-install.log 2>&1
   if [ $? != 0 ]; then
-    sudo apt-key adv --keyserver pool.sks-keyservers.net --recv 7F0CEB10
+    sudo apt-key adv --keyserver pool.sks-keyservers.net --recv 7F0CEB10 >>$LOG_DIR/mongodb-install.log 2>&1
   fi
   sudo apt-get update >$LOG_DIR/mongodb-install.log 2>&1
 
