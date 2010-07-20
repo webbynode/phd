@@ -57,7 +57,11 @@ else
 fi
 
 echo "Configuring PHP application..."
+needs_restart=y
 configure_vhost
+if [ $? -eq 1 ]; then
+  needs_restart=n
+fi
 
 echo "  => Configuring database..."
 sudo config_app_db $app_name > $LOG_DIR/config_db.log 2>&1
@@ -67,4 +71,6 @@ cd $dir
 sudo chown -R git:www-data * > $LOG_DIR/chown.log 2>&1
 cd -
 
-restart_webserver 0
+if [ "$needs_restart" == "y" ]; then
+  restart_webserver 0
+fi
