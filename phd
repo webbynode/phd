@@ -122,8 +122,13 @@ install_if_needed() {
   check_installed $1
   
   if [ "$installed" == "n" ]; then
-    echo Installing $1...
-    sudo apt-get install -y -q $1 2>&1 | sed 's/^/     /'
+    add_on_wait "Installing $1"
+    sudo apt-get install -y -q $1 2>&1 | sed 's/^/     /' > $LOG_DIR/$1-install.log 2>&1
+    
+    if [ "$?" != "0" ]; then
+      add_on_status "WARNING: There was an error installing $1."
+      add_on_status "         Please check $LOG_DIR/$1-install.log for installation logs."
+    fi
     
     if [ ! -z "$2" ]; then
       `$2`
