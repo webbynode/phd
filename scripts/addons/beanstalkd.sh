@@ -10,7 +10,7 @@ if [ "$installed" == "n" ]; then
   sudo sed -e 's|#START=yes|START=yes|' -i /etc/default/beanstalkd 
 
   add_on_wait "Starting Beanstalkd"
-  sudo /etc/init.d/beanstalkd
+  sudo /etc/init.d/beanstalkd start
   echo ""
 fi
 
