@@ -137,10 +137,10 @@ install_if_needed() {
 }
 
 check_bundler() {
-  result=`gem list bundler | gem grep bundler`
+  result=`gem list bundler | grep bundler`
   if [ "$?" != "0" ]; then
     # bundler not installed
-    gem install bundler
+    sudo gem install bundler
   fi
   
   if [ -f Gemfile ]; then
