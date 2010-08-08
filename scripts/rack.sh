@@ -19,7 +19,7 @@ configure_vhost
 already_existed=$?
 
 if [[ ! -d "$dir/public" ]]; then
-  echo "     WARNING: Missing public folder on your Rack app, it'll not run smoothly!"
+  echo "     WARNING: Missing public folder in your Rack app, it'll not run smoothly!"
 fi
 
 echo "  => Configuring database..."
