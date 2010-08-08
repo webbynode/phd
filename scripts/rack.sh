@@ -25,5 +25,7 @@ fi
 echo "  => Configuring database..."
 config_app_db $app_name > $LOG_DIR/config_db.log 2>&1
 
+check_bundler
+
 echo ""
 restart_webserver $already_existed
