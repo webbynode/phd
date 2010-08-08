@@ -136,6 +136,22 @@ install_if_needed() {
   fi
 }
 
+check_bundler() {
+  result=`gem list bundler | gem grep bundler`
+  if [ "$?" != "0" ]; then
+    # bundler not installed
+    gem install bundler
+  fi
+  
+  if [ -f Gemfile ]; then
+    echo "  => Bundling gems..."
+    unset GIT_DIR && bundle install --without test development > $LOG_DIR/bundler.log 2>&1
+    return 1
+  fi
+  
+  return 0
+}
+
 configure_apache_vhost() {
   if [[ -f "$PHD_VIRTUALHOSTS/$host" ]]; then
 		echo '     Already configured!'

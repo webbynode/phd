@@ -35,8 +35,12 @@ if [[ ! -f "$dir/config/database.yml" ]]; then
 fi
 
 cd $dir
-echo "  => Installing missing gems..."
-sudo RAILS_ENV=production rake gems:install > $LOG_DIR/gems_install.log 2>&1
+
+check_bundler
+if [ "$?" == "0" ]; then
+  echo "  => Installing missing gems..."
+  sudo RAILS_ENV=production rake gems:install > $LOG_DIR/gems_install.log 2>&1
+fi
 
 echo "  => Migrating database..."
 RAILS_ENV=production rake db:migrate > $LOG_DIR/db_migrate.log 2>&1
