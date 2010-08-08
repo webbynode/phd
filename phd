@@ -140,6 +140,7 @@ check_bundler() {
   result=`gem list bundler | grep bundler`
   if [ "$?" != "0" ]; then
     # bundler not installed
+    echo "  => Installing Bundler..."
     sudo gem install bundler --pre >> $LOG_DIR/bundler_install.log 2>&1
     sudo gem install bundler >> $LOG_DIR/bundler_install.log 2>&1
   fi
