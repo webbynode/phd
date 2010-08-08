@@ -29,7 +29,7 @@ else
     echo "  => Installing dependencies, this will take some minutes to complete..."
     echo ""
     
-    apt-get -y -q install flex bison monit
+    sudo apt-get -y -q install flex bison monit
 
     cd /tmp
     wget http://mmonit.com/monit/dist/monit-5.1.1.tar.gz
