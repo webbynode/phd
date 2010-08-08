@@ -120,9 +120,10 @@ if failed port 8000 protocol HTTP
     then restart" > /etc/monit/services/$app_name
     
 echo "  => Starting app..."
-sudo /etc/init.d/monit restart
+sudo /etc/init.d/monit restart > $LOG_DIR/monit.log 2>&1
+sleep 3
 sudo monit stop $host
-sleep 1
+sleep 5
 sudo monit start $host
 
 sudo chown -R git:www-data * > $LOG_DIR/chown.log 2>&1
