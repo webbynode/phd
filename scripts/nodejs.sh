@@ -83,7 +83,7 @@ set httpd port 2812
     cd /tmp/node
     ./configure
     make
-    make install
+    sudo make install
     
     node=`which node`
     if [[ -z "$node" ]]; then
