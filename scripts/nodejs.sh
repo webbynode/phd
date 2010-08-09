@@ -59,11 +59,32 @@ include /etc/monit/services/*
 check system nodejs
 set httpd port 2812
   allow admin:hello
-" > /etc/monitrc
+" > /tmp/monitrc
+
+    sudo mv /tmp/monitrc /etc
     sudo chmod 700 /etc/monitrc
+    sudo chown root /etc/monitrc
+
     sudo cp /etc/monitrc /etc/monit/monitrc
+    sudo chmod 700 /etc/monit/monitrc
+    sudo chown root /etc/monit/monitrc
+
     sudo sed -e 's|startup=0|startup=1|' -i /etc/default/monit
     sudo cp /usr/local/bin/monit /usr/sbin
+    
+    if [ ! -f /etc/monitrc ]; then
+      echo ""
+      echo "     Error writing monit config, aborting."
+      echo ""
+      exit 1
+    fi
+    
+    if [ ! -f /etc/monit/monitrc ]; then
+      echo ""
+      echo "     Error writing monit config, aborting."
+      echo ""
+      exit 1
+    fi
     
     echo "  => Starting monit"
     sudo /etc/init.d/monit start
