@@ -16,6 +16,12 @@ fi
 
 echo "Configuring Rails application..."
 
+rails2=`gem list rails | grep rails | grep \(2`
+if [ "$?" == "1" ]; then
+  echo "  => Missing Rails gem, installing..."
+  sudo gem install -v=2.3.8 rails > $LOG_DIR/rails_install.log 2>&1
+fi
+
 configure_vhost
 already_existed=$?
 
