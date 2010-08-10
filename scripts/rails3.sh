@@ -21,7 +21,7 @@ already_existed=$?
 
 rails2=`gem list rails | grep rails | grep \(3`
 if [ "$?" == "1" ]; then
-  echo "  => Missing Rails 3 gem, installing..."
+  echo "  => Missing Rails 3 gems, installing..."
   sudo apt-get install -q -y libpq-dev > $LOG_DIR/rails3_prereq.log 2>&1
   
   sudo gem install tzinfo builder memcache-client rack rack-test rack-mount erubis mail text-format thor bundler i18n rake --source http://gemcutter.org/  > $LOG_DIR/rails3_install.log 2>&1
