@@ -179,12 +179,20 @@ configure_nginx_vhost() {
 }
 
 configure_vhost() {
+  # handles wildcards
+  if [[ "$host" =~ "^\\*\\." ]]; then
+    dns_alias=$host
+    host=${host#*.}
+  fi
+  
   echo "  => Configuring $WEB_SERVER vHost..."
   if [[ "$WEB_SERVER" == "nginx" ]]; then
     configure_nginx_vhost
   else
     configure_apache_vhost
   fi
+  
+  host=$dns_alias
   
   return $?
 }
