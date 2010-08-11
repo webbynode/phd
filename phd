@@ -180,7 +180,7 @@ configure_nginx_vhost() {
 
 configure_vhost() {
   # handles wildcards
-  if [[ "$host" =~ "^\\*\\." ]]; then
+  if [[ "$host" =~ ^\*\. ]]; then
     dns_alias=$host
     host=${host#*.}
   fi
