@@ -182,10 +182,12 @@ configure_vhost() {
   echo "  => Configuring $WEB_SERVER vHost..."
 
   # handles wildcards
+  wildcard=0
   if [[ "$host" =~ ^\*\. ]]; then
     echo "     Setting up wildcard alias..."
     dns_alias=$host
     host=${host#*.}
+    wildcard=1
   fi
   
   if [[ "$WEB_SERVER" == "nginx" ]]; then
@@ -194,7 +196,9 @@ configure_vhost() {
     configure_apache_vhost
   fi
   
-  host=$dns_alias
+  if [ $wildcard == 1 ]; then
+    host=$dns_alias
+  fi
   
   return $?
 }
