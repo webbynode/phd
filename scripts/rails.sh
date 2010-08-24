@@ -16,10 +16,17 @@ fi
 
 echo "Configuring Rails application..."
 
-rails2=`gem list rails | grep rails | grep \(2`
-if [ "$?" == "1" ]; then
-  echo "  => Missing Rails gem, installing..."
-  sudo gem install -v=2.3.8 rails > $LOG_DIR/rails_install.log 2>&1
+# Checks Rails version
+if [ -f "$dir/config/environment.rb" ]; then
+  rails_version=`grep RAILS_GEM_VERSION $dir/config/environment.rb | sed "s/RAILS_GEM_VERSION = \'\(.*\)\'.*/\1/"`
+  
+  echo "  => Detected Application running Rails $rails_version"
+  gem=`gem list rails | grep rails | grep $rails_version`
+  
+  if [[ "$?" == "1" ]]; then
+    echo "  => Missing Rails $rails_version gem, installing..."
+    sudo gem install -v=$rails_version rails > $LOG_DIR/rails_install.log
+  fi
 fi
 
 configure_vhost
@@ -46,6 +53,13 @@ check_bundler
 if [ "$?" == "0" ]; then
   echo "  => Installing missing gems..."
   sudo RAILS_ENV=production rake gems:install > $LOG_DIR/gems_install.log 2>&1
+  if [ "$?" != "0" ]; then
+    echo "  -----------------------------------------------------"
+    echo "    There was an error installing gems:"
+    echo ""
+    cat $LOG_DIR/gems_install.log | sed 's/^/     /'
+    exit 1
+  fi
 fi
 
 echo "  => Migrating database..."
