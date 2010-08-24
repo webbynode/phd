@@ -53,13 +53,7 @@ check_bundler
 if [ "$?" == "0" ]; then
   echo "  => Installing missing gems..."
   sudo RAILS_ENV=production rake gems:install > $LOG_DIR/gems_install.log 2>&1
-  if [ "$?" != "0" ]; then
-    echo "  -----------------------------------------------------"
-    echo "    There was an error installing gems:"
-    echo ""
-    cat $LOG_DIR/gems_install.log | sed 's/^/     /'
-    exit 1
-  fi
+  check_error 'installing gems', 'gems_install'
 fi
 
 echo "  => Migrating database..."

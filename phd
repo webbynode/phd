@@ -107,6 +107,19 @@ add_on_wait() {
   echo "     This may take a few minutes, please wait..."
 }
 
+check_error() {
+  if [ "$?" != "0" ]; then
+    echo "  -----------------------------------------------------"
+    echo "    There was an error $1:"
+    echo ""
+    cat $LOG_DIR/$2.log | sed 's/^/     /'
+    echo ""
+    echo "    Please fix this problem and run wn push again."
+    echo "  -----------------------------------------------------"
+    exit 1
+  fi
+}
+
 check_installed() {
   installed=n
   output=`dpkg -s $1 2>&1`
