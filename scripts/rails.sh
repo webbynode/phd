@@ -18,7 +18,7 @@ echo "Configuring Rails application..."
 
 # Checks Rails version
 if [ -f "$dir/config/environment.rb" ]; then
-  rails_version=`grep RAILS_GEM_VERSION $dir/config/environment.rb | sed "s/RAILS_GEM_VERSION = \'\(.*\)\'.*/\1/"`
+  rails_version=`grep RAILS_GEM_VERSION $dir/config/environment.rb | sed "s/RAILS_GEM_VERSION = '//g" | sed "s/' .*//g"`
   
   echo "  => Detected Application running Rails $rails_version"
   gem=`gem list rails | grep rails | grep $rails_version`
