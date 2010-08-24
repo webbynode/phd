@@ -24,7 +24,7 @@ if [ -f "$dir/config/environment.rb" ]; then
   gem=`gem list rails | grep rails | grep $rails_version`
   
   if [[ "$?" == "1" ]]; then
-    echo "  => Missing Rails $rails_version gem, installing..."
+    echo "     Missing Rails $rails_version gem, installing..."
     sudo gem install -v=$rails_version rails > $LOG_DIR/rails_install.log
   fi
 fi
@@ -34,6 +34,7 @@ already_existed=$?
 
 echo "  => Configuring database..."
 sudo config_app_db $app_name > $LOG_DIR/config_db.log 2>&1
+check_error 'configuring database' 'config_db'
 
 # checks the db/username
 name=$app_name
@@ -53,11 +54,12 @@ check_bundler
 if [ "$?" == "0" ]; then
   echo "  => Installing missing gems..."
   sudo RAILS_ENV=production rake gems:install > $LOG_DIR/gems_install.log 2>&1
-  check_error 'installing gems', 'gems_install'
+  check_error 'installing gems' 'gems_install'
 fi
 
 echo "  => Migrating database..."
 RAILS_ENV=production rake db:migrate > $LOG_DIR/db_migrate.log 2>&1
+check_error 'migrating database' 'db_migrate'
 
 sudo chown -R git:www-data * > $LOG_DIR/chown.log 2>&1
 cd -

@@ -30,6 +30,7 @@ fi
 
 echo "  => Configuring database..."
 sudo config_app_db $app_name > $LOG_DIR/config_db.log 2>&1
+check_error 'configuring database' 'config_db'
 
 # checks the db/username
 name=$app_name
@@ -46,8 +47,9 @@ fi
 cd $dir
 echo "  => Bundling gems..."
 unset GIT_DIR && bundle install --without test development > $LOG_DIR/bundler.log 2>&1
+check_error 'bundling gems' 'bundler'
 
-ruby -e "require 'rubygems'; require 'bundler'" -e "sqlite3 = Bundler.definition.dependencies.select { |d| d.name == 'sqlite3-ruby' }.first; exit(0) unless sqlite3; groups = sqlite3.groups - [:test, :development]; if groups.any?; exit(1); else; exit(0); end"
+ruby -e "require 'rubygems'; require 'bundler'" -e "sqlite3 = Bundler.definition.dependencies.select { |d| d.name == 'sqlite3-ruby' }.first; exit(0) unless sqlite3; groups = sqlite3.groups - [:test, :development]; if groups.any?; exit(1); else; exit(0); end" > $LOG_DIR/check_sqlite3.log 2>&1
 
 if [ $? -eq 1 ]; then
   echo ""
@@ -67,6 +69,7 @@ fi
 
 echo "  => Migrating database..."
 RAILS_ENV=production rake db:migrate > $LOG_DIR/db_migrate.log 2>&1
+check_error 'migrating database' 'db_migrate'
 
 sudo chown -R git:www-data * > $LOG_DIR/chown.log 2>&1
 cd -
