@@ -4,18 +4,21 @@
 #
 # eventually, it might be `phd run [app]` if phd gets more sophisticated
 
-# default apache virtualhosts path
-PHD_APACHE_VIRTUALHOSTS='/etc/apache2/phd-sites'
-PHD_APACHE_CONFIG='/etc/apache2/apache2.conf'
-PHD_APACHE_INCLUDE="Include $PHD_APACHE_VIRTUALHOSTS"
-PHD_APACHE_VIRTUALHOST_TEXT='<VirtualHost *:80>
-  ServerName $host
-  DocumentRoot $dir/public
-  PassengerAppRoot $dir
-</VirtualHost>'
+if [[ -z "$1" ]]; then
+	echo "Usage: phd [application's .git directory] [hostname]" 
+	exit
+fi
+
+PHD_ROOT=/var/webbynode/phd
+LOG_DIR=/var/webbynode/log
+
+if [ ! -d $LOG_DIR ]; then
+  sudo mkdir -p $LOG_DIR
+  sudo chown -R git:www-data $LOG_DIR
+fi
 
 dir=$(dirname $1)
-host=$2
+host=$3
 app_name=$(basename $dir)
 base=$host
 
@@ -24,8 +27,10 @@ if [[ ! "$host" =~ "." ]]; then
   host="$host.webbyapp.com"
 fi
 
-sudo mkdir -p /var/log/phd
-sudo chown -R git:www-data /var/log/phd
+# read .phdrc (for overrides)
+if [[ -f ~/.phdrc ]]; then
+	source ~/.phdrc
+fi
 
 echo ""
 echo "----------------------------"
@@ -33,6 +38,36 @@ echo "  Webbynode git deployment "
 echo "----------------------------"
 echo ""
 
+if [[ -d "/opt/nginx" ]]; then
+  echo "Nginx+Passenger webserver detected..."
+  WEB_SERVER="nginx"
+  WEB_SERVER_ROOT="/opt/nginx"
+elif [[ -d '/etc/nginx' ]]; then
+  echo "Nginx webserver detected..."
+  WEB_SERVER="nginx"
+  WEB_SERVER_ROOT="/etc/nginx"
+else
+  echo "Apache webserver detected..."
+  WEB_SERVER="apache"
+  WEB_SERVER_ROOT='/etc/apache2'
+fi
+
+if [[ "$WEB_SERVER" == "nginx" ]]; then
+  # default nginx virtualhosts path
+  PHD_VIRTUALHOSTS="$WEB_SERVER_ROOT/phd-sites"
+  PHD_CONFIG="$WEB_SERVER_ROOT/conf/nginx.conf"
+  PHD_INCLUDE="include $PHD_VIRTUALHOSTS/*;"
+else
+  # default apache virtualhosts path
+  PHD_VIRTUALHOSTS='/etc/apache2/phd-sites'
+  PHD_CONFIG='/etc/apache2/apache2.conf'
+  PHD_INCLUDE="Include $PHD_VIRTUALHOSTS"
+fi
+
+PUSHAND_INSTALL_DIR=~/tmp
+
+sudo mkdir -p /var/log/phd
+sudo chown -R git:www-data /var/log/phd
 
 if [[ ! "$base" =~ "." ]]; then
   ip=`ifconfig | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $1}'`
@@ -43,88 +78,204 @@ if [[ ! "$base" =~ "." ]]; then
   host="$name.webbyapp.com"
 fi
 
+if [[ -f /var/webbynode/mappings/$app_name.conf ]]; then
+  app_dns=$(cat /var/webbynode/mappings/$app_name.conf)
+  if [[ ! "$app_dns" = "$host" ]]; then
+    echo "Application dns entry changed from $app_dns to $host"
+    echo "  => Fixing mapping"
+    rm /var/webbynode/mappings/$app_name.conf
+    
+    echo "  => Removing vHost for $app_dns"
+    rm $PHD_VIRTUALHOSTS/$app_dns
+    
+    echo ""
+  fi
+fi
+
 echo "Deploying application $app_name as $host..."
 
+add_on() {
+  echo "  => Installing addon $1"
+}
+
+add_on_status() {
+  echo "     $1..."  
+}
+
+add_on_wait() {
+  echo "     $1..."
+  echo "     This may take a few minutes, please wait..."
+}
+
+check_error() {
+  if [ "$?" != "0" ]; then
+    echo "  -----------------------------------------------------"
+    echo "    There was an error $1:"
+    echo ""
+    cat $LOG_DIR/$2.log | sed 's/^/     /'
+    echo ""
+    echo "    Please fix this problem and run wn push again."
+    echo "  -----------------------------------------------------"
+    exit 1
+  fi
+}
+
+check_installed() {
+  installed=n
+  output=`dpkg -s $1 2>&1`
+  if [ $? == 0 ]; then
+    output=`dpkg -s $1 | grep Status: | grep " installed"`
+    if [ $? == 0 ]; then
+      installed=y
+    fi
+  fi
+}
+
+install_if_needed() {
+  check_installed $1
+  
+  if [ "$installed" == "n" ]; then
+    add_on_wait "Installing $1"
+    sudo apt-get install -y -q $1 2>&1 | sed 's/^/     /' > $LOG_DIR/$1-install.log 2>&1
+    
+    if [ "$?" != "0" ]; then
+      add_on_status "WARNING: There was an error installing $1."
+      add_on_status "         Please check $LOG_DIR/$1-install.log for installation logs."
+    fi
+    
+    if [ ! -z "$2" ]; then
+      `$2`
+    fi
+  fi
+}
+
+check_bundler() {
+  result=`gem list bundler | grep bundler`
+  if [ "$?" != "0" ]; then
+    # bundler not installed
+    echo "  => Installing Bundler..."
+    sudo gem install bundler --pre >> $LOG_DIR/bundler_install.log 2>&1
+    sudo gem install bundler >> $LOG_DIR/bundler_install.log 2>&1
+  fi
+  
+  if [ -f Gemfile ]; then
+    echo "  => Bundling gems..."
+    unset GIT_DIR && bundle install --without test development > $LOG_DIR/bundler.log 2>&1
+    return 1
+  fi
+  
+  return 0
+}
+
 configure_apache_vhost() {
-  if [[ -f "$PHD_APACHE_VIRTUALHOSTS/$host" ]]; then
-		echo 'Already configured'
+  if [[ -f "$PHD_VIRTUALHOSTS/$host" ]]; then
+		echo '     Already configured!'
+		return 1
 	else
-		PHD_APACHE_VIRTUALHOST_TEXT="echo \"$PHD_APACHE_VIRTUALHOST_TEXT\""
-		eval "$PHD_APACHE_VIRTUALHOST_TEXT" > $PHD_APACHE_VIRTUALHOSTS/$host
+		PHD_VIRTUALHOST_TEXT="echo \"$PHD_VIRTUALHOST_TEXT\""
+		eval "$PHD_VIRTUALHOST_TEXT" > $PHD_VIRTUALHOSTS/$host
 		echo "$host" >> /var/webbynode/mappings/$app_name.conf
+		return 0
 	fi
 }
 
-# read .phdrc (for overrides)
-if [[ -f ~/.phdrc ]]; then
-	source ~/.phdrc
-fi
+configure_nginx_vhost() {
+  if [[ -f "$PHD_VIRTUALHOSTS/$host" ]]; then
+		echo '     Already configured!'
+		return 1
+	else
+		PHD_VIRTUALHOST_TEXT="echo \"$PHD_VIRTUALHOST_TEXT\""
+		eval "$PHD_VIRTUALHOST_TEXT" > $PHD_VIRTUALHOSTS/$host
+		echo "$host" >> /var/webbynode/mappings/$app_name.conf
+		return 0
+	fi
+}
 
-# if [[ ! -f "$PHD_APACHE_VIRTUALHOSTS" ]]; then
-#   echo "$PHD_APACHE_VIRTUALHOSTS hasn't been configured"
-#   echo "It needs to be editable by the git user"  
-# fi
+configure_vhost() {
+  echo "  => Configuring $WEB_SERVER vHost..."
 
-if [[ -z "$dir" || -z "$host" ]]; then
-	echo "Usage: phd [application's .git directory] [hostname]"
-	exit
-fi
-
-if [[ -d "$dir/app" && -d "$dir/app/controllers" && -f "$dir/config/environment.rb" ]]; then
-  echo "Configuring Rails application..."
-  
-  echo "  => Configuring apache vHost..."
-  configure_apache_vhost
-
-  echo "  => Configuring database..."
-  sudo config_app_db $app_name > /var/log/phd/config_db.log 2>&1
-	
-  if [[ ! -f "$dir/config/database.yml" ]]; then
-    echo "  => Configuring database.yml..."
-    sed "s/@app_name@/$app_name/g" /var/webbynode/templates/database.yml > $dir/config/database.yml
+  # handles wildcards
+  wildcard=0
+  if [[ "$host" =~ ^\*\. ]]; then
+    echo "     Setting up wildcard alias..."
+    dns_alias=$host
+    host=${host#*.}
+    wildcard=1
   fi
-
-  cd $dir
-  echo "  => Installing missing gems..."
-  sudo RAILS_ENV=production rake gems:install > /var/log/phd/gems_install.log 2>&1
   
-  echo "  => Migrating database..."
-  RAILS_ENV=production rake db:migrate > /var/log/phd/db_migrate.log 2>&1
-
-  sudo chown -R git:www-data * > /var/log/phd/chown.log 2>&1
-  cd -
-  
-  echo ""
-  echo "Restarting apache..."
-  sudo /etc/init.d/apache2 restart > /var/log/phd/apache2_restart.log 2>&1
-
-  echo ""
-  echo "$app_name deployed successfully."
-  if [[ ! "$base" =~ "." ]]; then
-    echo ""
-    echo "Created http://$host/"
-  fi
-  echo ""
-
-else
-  if [[ -f "$dir/config.ru" ]]; then
-    echo "Configuring Rack application..."
-    echo "  => Configuring apache vHost..."
+  if [[ "$WEB_SERVER" == "nginx" ]]; then
+    configure_nginx_vhost
+  else
     configure_apache_vhost
+  fi
+  
+  if [ $wildcard == 1 ]; then
+    host=$dns_alias
+  fi
+  
+  return $?
+}
 
-    echo "  => Configuring database..."
-    config_app_db $app_name > /var/log/phd/config_db.log 2>&1
-
-    echo ""
-    echo "Restarting apache..."
-    sudo /etc/init.d/apache2 restart > /var/log/phd/apache2_restart.log 2>&1
-
-    echo ""
-    echo "$app_name deployed successfully."
-    if [[ ! "$base" =~ "." ]]; then
-      echo ""
-      echo "Created http://$name.webbyapp.com/"
+restart_webserver() {
+  echo ""
+  if [[ "$1" == "1" ]]; then
+    echo "Restarting passenger..."
+    mkdir -p $dir/tmp
+    touch $dir/tmp/restart.txt > $LOG_DIR/passenger_restart.log 2>&1
+  else
+    echo "Restarting $WEB_SERVER"
+    if [[ "$WEB_SERVER" == "apache" ]]; then
+      sudo /etc/init.d/apache2 restart > $LOG_DIR/apache2_restart.log 2>&1
+    else
+      sudo /etc/init.d/nginx stop  > $LOG_DIR/nginx_stop.log 2>&1
+      sleep 2
+      sudo /etc/init.d/nginx start > $LOG_DIR/nginx_start.log 2>&1
     fi
-    echo ""
+  fi
+}
+
+if [[ -f "$dir/.webbynode/settings" ]]; then
+  vars=`cat $dir/.webbynode/settings` 
+  eval $vars
+fi
+
+echo ""
+
+if [[ ! -z "addons" ]]; then
+  echo "Configuring addons..."
+  
+  for addon in ${addons[@]}; do
+    if [[ ! -f "$PHD_ROOT/scripts/addons/$addon.sh" ]]; then
+      echo "WARNING: Missing support for addon: $addon. Skipping"
+    else
+      . $PHD_ROOT/scripts/addons/$addon.sh
+    fi
+  done
+  
+  echo ""
+fi
+
+if [[ ! -z "$engine" ]]; then
+  if [[ ! -f "$PHD_ROOT/scripts/$engine.sh" ]]; then
+    echo "Missing support for engine: $engine. Aborting."
+    exit
+  else
+    . $PHD_ROOT/scripts/$engine.sh
+  fi
+else
+  if [[ -d "$dir/app" && -d "$dir/app/controllers" && -f "$dir/config/environment.rb" ]]; then
+    . $PHD_ROOT/scripts/rails.sh
+  elif [[ -f "$dir/config.ru" ]]; then
+    . $PHD_ROOT/scripts/rack.sh
+  else
+    echo "WARNING: Didn't detect what application engine you're using."
   fi
 fi
+
+echo ""
+echo "$app_name deployed successfully."
+if [[ ! "$base" =~ "." ]]; then
+  echo ""
+  echo "Created http://$host/"
+fi
+echo ""
