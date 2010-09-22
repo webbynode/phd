@@ -121,6 +121,14 @@ set httpd port 2812
 fi
 
 echo "Configuring node.js application..."
+script="server.js"
+
+test -f $dir/$script || {
+  echo "     ERROR: Missing server.js script. Aborting installation."
+  exit 1
+}
+
+
 configure_vhost
 
 echo "  => Configuring database..."
@@ -129,7 +137,7 @@ sudo config_app_db $app_name > $LOG_DIR/config_db.log 2>&1
 cd $dir
 
 #script=`ls -1 *.js|tail -1`
-script="index.js"
+
 echo "  => Configuring monit..."
 sudo rm /etc/monit/services/$app_name > /dev/null 2>&1
 sudo echo "check host $host with address 127.0.0.1
