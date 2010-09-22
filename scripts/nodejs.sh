@@ -155,11 +155,9 @@ mkdir -p /var/webbynode/hooks/delete
 echo "echo \"  => Removing port mapping\"
 rm $port_mapping
 
-echo \"\"
 echo \"  => Stopping node.js app...\"
 sudo monit stop $host
 
-echo \"\"
 echo \"  => Removing monit watchdog...\"
 rm /etc/monit/services/$app_name
 
@@ -200,6 +198,5 @@ if [ "$installing" == "1" ]; then
 else
   if [[ "$WEB_SERVER" == "nginx" ]]; then
     sudo /etc/init.d/nginx reload  > $LOG_DIR/nginx_reload.log 2>&1
-    check_error 'reloading nginx' 'nginx_reload'
   fi
 fi
