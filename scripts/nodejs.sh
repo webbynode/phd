@@ -145,14 +145,25 @@ if [ -f $port_mapping ]; then
     echo "     ERROR: Port $nodejs_port is already used by application $port_mapping_app"
     exit 1
   fi
+  rm $port_mapping
 fi
 
-rm $port_mapping
 echo $app_name > $port_mapping
 
 # adds a deletion hook
 mkdir -p /var/webbynode/hooks/delete
-echo "rm $port_mapping_app" > /var/webbynode/hooks/delete/$app_name
+echo "echo \"  => Removing port mapping\"
+rm /var/webbynode/mappings/$port_mapping
+
+echo \"\"
+echo \"  => Stopping node.js app...\"
+sudo monit stop $host
+
+echo \"\"
+echo \"  => Removing monit watchdog...\"
+rm /etc/monit/services/$app_name
+
+" > /var/webbynode/hooks/delete/$app_name
 
 configure_vhost
 
