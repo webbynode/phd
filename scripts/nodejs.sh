@@ -153,7 +153,7 @@ echo $app_name > $port_mapping
 # adds a deletion hook
 mkdir -p /var/webbynode/hooks/delete
 echo "echo \"  => Removing port mapping\"
-rm /var/webbynode/mappings/$port_mapping
+rm $port_mapping
 
 echo \"\"
 echo \"  => Stopping node.js app...\"
@@ -197,4 +197,9 @@ sudo chown -R git:www-data * > $LOG_DIR/chown.log 2>&1
 
 if [ "$installing" == "1" ]; then
   restart_webserver 0
+else
+  if [[ "$WEB_SERVER" == "nginx" ]]; then
+    sudo /etc/init.d/nginx reload  > $LOG_DIR/nginx_reload.log 2>&1
+    check_error 'reloading nginx' 'nginx_reload'
+  fi
 fi
