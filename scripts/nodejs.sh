@@ -147,8 +147,8 @@ if [ -f $port_mapping ]; then
   fi
 fi
 
-rm $port_mapping_app
-echo $app_name > $port_mapping_app
+rm $port_mapping
+echo $app_name > $port_mapping
 
 # adds a deletion hook
 mkdir -p /var/webbynode/hooks/delete
