@@ -1,10 +1,3 @@
-echo "------------------------------"
-echo " NodeJS Application Settings:"
-echo "   Use proxy: $nodejs_proxy"
-echo "        Port: $nodejs_port"
-echo "------------------------------"
-echo ""
-
 if [[ "$WEB_SERVER" == "apache" ]]; then
   echo "Node.js Engine is not yet supported in Apache"
 else
