@@ -9,7 +9,7 @@ if [[ "$WEB_SERVER" == "apache" ]]; then
   echo "Node.js Engine is not yet supported in Apache"
 else
   if [ "$nodejs_proxy" == "Y" ]; then
-    PHD_VIRTUALHOST_TEXT='upstream app_cluster_1 {
+    PHD_VIRTUALHOST_TEXT='upstream ${app_name}_cluster {
         server 127.0.0.1:$nodejs_port;
     }
 
@@ -23,7 +23,7 @@ else
             proxy_set_header Host \$http_host;
             proxy_set_header X-NginX-Proxy true;
 
-            proxy_pass http://app_cluster_1/;
+            proxy_pass http://${app_name}_cluster/;
             proxy_redirect off;
         }
     }'
