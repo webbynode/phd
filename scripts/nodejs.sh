@@ -176,7 +176,7 @@ sudo rm /etc/monit/services/$app_name > /dev/null 2>&1
 mkdir -p $LOG_DIR/node
 sudo echo "check host $host with address 127.0.0.1
 start program = \"/usr/local/bin/node $dir/$script > $LOG_DIR/node/$app_name.log 2>&1\"
-stop program  = \"/bin/kill \$(ps -eo pid,args | grep $dir/$script | grep -v grep | cut -c1-6)\"
+stop program  = \"/usr/bin/pkill -f 'node $dir/$script'\"
 if failed port $nodejs_port protocol HTTP
     request /
     with timeout 10 seconds
@@ -188,7 +188,7 @@ check_error 'configuring database' 'monit'
 
 sleep 3
 sudo monit stop $host
-sleep 5
+sleep 3
 sudo monit start $host
 
 sudo chown -R git:www-data * > $LOG_DIR/chown.log 2>&1
@@ -197,6 +197,6 @@ if [ "$installing" == "1" ]; then
   restart_webserver 0
 else
   if [[ "$WEB_SERVER" == "nginx" ]]; then
-    sudo /etc/init.d/nginx reload  > $LOG_DIR/nginx_reload.log 2>&1
+    sudo /etc/init.d/nginx reload > $LOG_DIR/nginx_reload.log 2>&1
   fi
 fi
