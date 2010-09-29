@@ -149,6 +149,12 @@ echo "echo \"  => Removing port mapping\"
 rm $port_mapping
 
 echo \"  => Stopping node.js app...\"
+sudo stop $app_name
+
+echo \"  => Removing node.js app upstart service...\"
+sudo rm /etc/init/$app_name.conf
+
+echo \"  => Stopping monit watchdog...\"
 sudo monit stop $host
 
 echo \"  => Removing monit watchdog...\"
