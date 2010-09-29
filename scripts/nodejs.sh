@@ -32,7 +32,7 @@ else
     echo ""
     
     sudo apt-get -y -q install flex bison monit
-
+    
     cd /tmp
     wget http://mmonit.com/monit/dist/monit-5.1.1.tar.gz
     tar -vzxf monit-5.1.1.tar.gz
@@ -87,6 +87,11 @@ set httpd port 2812
       echo ""
       exit 1
     fi
+    
+    echo "  => Installing npm"
+    
+    curl -s http://npmjs.org/install.sh | sh > $LOG_DIR/npm.log 2>&1
+    check_error 'installing npm' 'npm'
     
     echo "  => Starting monit"
     sudo /etc/init.d/monit start
