@@ -156,7 +156,9 @@ rm /etc/monit/services/$app_name
 
 " > /var/webbynode/hooks/delete/$app_name
 
-configure_vhost
+if [ "$nodejs_proxy" == "Y" ]; then
+  configure_vhost
+fi
 
 echo "  => Configuring database..."
 sudo config_app_db $app_name > $LOG_DIR/config_db.log 2>&1
@@ -164,25 +166,42 @@ check_error 'configuring database' 'config_db'
 
 cd $dir
 
-echo "  => Configuring monit..."
-sudo rm /etc/monit/services/$app_name > /dev/null 2>&1
-mkdir -p $LOG_DIR/node
-sudo echo "check host $host with address 127.0.0.1
-start program = \"/usr/local/bin/node $dir/$script > $LOG_DIR/node/$app_name.log 2>&1\"
-stop program  = \"/usr/bin/pkill -f 'node $dir/$script'\"
-if failed port $nodejs_port protocol HTTP
-    request /
-    with timeout 10 seconds
-    then restart" > /etc/monit/services/$app_name
-    
-echo "  => Starting app..."
-sudo /etc/init.d/monit restart > $LOG_DIR/monit.log 2>&1
-check_error 'configuring database' 'monit'
+echo "  => Configuring upstart..."
+echo "#!upstart
+description \"$app_name node.js server\"
+author      \"Webbynode Rapp\"
 
-sleep 3
-sudo monit stop $host
-sleep 3
-sudo monit start $host
+start on startup
+stop on shutdown
+
+script
+    export HOME="$HOME"
+
+    exec sudo -u git /usr/local/bin/node $dir/$script 2>&1 >> $LOG_DIR/node/$app_name.log 2>&1
+end script" > /etc/init/$app_name.conf
+sudo chmod +x /etc/init/$app_name.conf
+
+start $app_name
+
+# echo "  => Configuring monit..."
+# sudo rm /etc/monit/services/$app_name > /dev/null 2>&1
+# mkdir -p $LOG_DIR/node
+# sudo echo "check host $host with address 127.0.0.1
+# start program = \"/usr/local/bin/node $dir/$script >> $LOG_DIR/node/$app_name_monit.log 2>&1\"
+# stop program  = \"/usr/bin/pkill -f 'node $dir/$script'\"
+# if failed port $nodejs_port protocol HTTP
+#     request /
+#     with timeout 10 seconds
+#     then restart" > /etc/monit/services/$app_name
+#     
+# echo "  => Starting app..."
+# sudo /etc/init.d/monit restart > $LOG_DIR/monit.log 2>&1
+# check_error 'configuring database' 'monit'
+# 
+# sleep 3
+# sudo monit stop $host
+# sleep 3
+# sudo monit start $host
 
 sudo chown -R git:www-data * > $LOG_DIR/chown.log 2>&1
 
