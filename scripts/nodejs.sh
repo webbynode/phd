@@ -149,6 +149,12 @@ echo "echo \"  => Removing port mapping\"
 rm $port_mapping
 
 echo \"  => Stopping node.js app...\"
+sudo stop $app_name
+
+echo \"  => Removing node.js app upstart service...\"
+sudo rm /etc/init/$app_name.conf
+
+echo \"  => Stopping monit watchdog...\"
 sudo monit stop $host
 
 echo \"  => Removing monit watchdog...\"
@@ -156,33 +162,50 @@ rm /etc/monit/services/$app_name
 
 " > /var/webbynode/hooks/delete/$app_name
 
-configure_vhost
+if [ "$nodejs_proxy" == "Y" ]; then
+  configure_vhost
+fi
 
 echo "  => Configuring database..."
 sudo config_app_db $app_name > $LOG_DIR/config_db.log 2>&1
 check_error 'configuring database' 'config_db'
 
 cd $dir
+mkdir -p $LOG_DIR/node
+
+echo "  => Configuring upstart..."
+sudo echo "#!upstart
+description \"$app_name node.js server\"
+author      \"Webbynode Rapp\"
+
+start on startup
+stop on shutdown
+
+script
+    export HOME="$HOME"
+
+    exec sudo -u git /usr/local/bin/node $dir/$script 2>&1 >> $LOG_DIR/node/$app_name.log 2>&1
+end script" > /tmp/$app_name.conf
+sudo mv /tmp/$app_name.conf /etc/init
+sudo chmod +x /etc/init/$app_name.conf
+
+sudo start $app_name
 
 echo "  => Configuring monit..."
 sudo rm /etc/monit/services/$app_name > /dev/null 2>&1
-mkdir -p $LOG_DIR/node
-sudo echo "check host $host with address 127.0.0.1
-start program = \"/usr/local/bin/node $dir/$script > $LOG_DIR/node/$app_name.log 2>&1\"
-stop program  = \"/usr/bin/pkill -f 'node $dir/$script'\"
-if failed port $nodejs_port protocol HTTP
-    request /
-    with timeout 10 seconds
-    then restart" > /etc/monit/services/$app_name
-    
-echo "  => Starting app..."
-sudo /etc/init.d/monit restart > $LOG_DIR/monit.log 2>&1
-check_error 'configuring database' 'monit'
+sudo echo "#!monit
+set logfile $LOG_DIR/node/$app_name_monit.log
 
-sleep 3
-sudo monit stop $host
-sleep 3
-sudo monit start $host
+check host $host with address 127.0.0.1
+    start program = \"/sbin/start $app_name\"
+    stop program  = \"/sbin/stop $app_name\"
+    if failed port $nodejs_port protocol HTTP
+        request /
+        with timeout 10 seconds
+        then restart" > /etc/monit/services/$app_name
+    
+echo "  => Restarting monit..."
+sudo /etc/init.d/monit restart > $LOG_DIR/monit.log 2>&1
 
 sudo chown -R git:www-data * > $LOG_DIR/chown.log 2>&1
 
