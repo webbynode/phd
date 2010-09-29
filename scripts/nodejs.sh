@@ -196,7 +196,7 @@ sudo rm /etc/monit/services/$app_name > /dev/null 2>&1
 sudo echo "#!monit
 set logfile $LOG_DIR/node/$app_name_monit.log
 
-check host nodejs with address 127.0.0.1
+check host $host with address 127.0.0.1
     start program = \"/sbin/start $app_name\"
     stop program  = \"/sbin/stop $app_name\"
     if failed port $nodejs_port protocol HTTP
