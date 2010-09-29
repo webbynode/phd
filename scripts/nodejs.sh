@@ -200,7 +200,6 @@ check host nodejs with address 127.0.0.1
     
 echo "  => Restarting monit..."
 sudo /etc/init.d/monit restart > $LOG_DIR/monit.log 2>&1
-check_error 'restarting monit' 'monit'
 
 sudo chown -R git:www-data * > $LOG_DIR/chown.log 2>&1
 
