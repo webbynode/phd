@@ -78,6 +78,11 @@ allow admin:hello
     exit 1
   fi
   
+  echo "  => Installing npm"
+  
+  curl -s http://npmjs.org/install.sh | sh > $LOG_DIR/npm.log 2>&1
+  check_error 'installing npm' 'npm'
+  
   echo "  => Starting monit"
   sudo /etc/init.d/monit start
   
