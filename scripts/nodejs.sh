@@ -6,10 +6,12 @@ if [[ ! -x "/usr/local/bin/node" ]]; then
   test "$WEB_SERVER" == "apache" && {
     echo ""
     echo "  => Configuring Apache..."
-    echo ""
 
-    a2enmod proxy proxy_http   > $LOG_DIR/apache2_modules.log 2>&1
+    sudo a2enmod proxy proxy_http   > $LOG_DIR/apache2_modules.log 2>&1
     check_error 'configuring apache' 'apache2_modules'
+
+    sudo sed -i 's|Order deny,allow|Order allow,deny|' /etc/apache2/mods-enabled/proxy.conf
+    sudo sed -i 's|Deny from all|Allow from all|' /etc/apache2/mods-enabled/proxy.conf
 
     /etc/init.d/apache2 reload > $LOG_DIR/apache2_reload.log 2>&1
     check_error 'reloading apache' 'apache2_reload'
