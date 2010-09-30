@@ -7,13 +7,15 @@ if [[ ! -x "/usr/local/bin/node" ]]; then
     echo ""
     echo "  => Configuring Apache..."
 
-    sudo a2enmod proxy proxy_http   > $LOG_DIR/apache2_modules.log 2>&1
-    check_error 'configuring apache' 'apache2_modules'
+    if [ ! -f /etc/apache2/mods-enabled/proxy.conf ]; then
+      sudo a2enmod proxy proxy_http   > $LOG_DIR/apache2_modules.log 2>&1
+      check_error 'configuring apache' 'apache2_modules'
+    fi
 
     sudo sed -i 's|Order deny,allow|Order allow,deny|' /etc/apache2/mods-enabled/proxy.conf
     sudo sed -i 's|Deny from all|Allow from all|' /etc/apache2/mods-enabled/proxy.conf
 
-    /etc/init.d/apache2 reload > $LOG_DIR/apache2_reload.log 2>&1
+    sudo /etc/init.d/apache2 reload > $LOG_DIR/apache2_reload.log 2>&1
     check_error 'reloading apache' 'apache2_reload'
   }
 
@@ -78,11 +80,6 @@ allow admin:hello
     exit 1
   fi
   
-  echo "  => Installing npm"
-  
-  curl -s http://npmjs.org/install.sh | sh > $LOG_DIR/npm.log 2>&1
-  check_error 'installing npm' 'npm'
-  
   echo "  => Starting monit"
   sudo /etc/init.d/monit start
   
@@ -101,7 +98,7 @@ allow admin:hello
   cd /tmp/node
   ./configure
   make
-  sudo make install
+  make install
   
   node=`which node`
   if [[ -z "$node" ]]; then
@@ -112,6 +109,13 @@ allow admin:hello
   else
     rm -fR /tmp/node
   fi
+  
+  echo "  => Installing npm"
+  
+  sudo chown -R git:git /usr/local/lib/node
+  
+  curl -s http://npmjs.org/install.sh | sh > $LOG_DIR/npm.log 2>&1
+  check_error 'installing npm' 'npm'
   
 fi
 
