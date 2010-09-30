@@ -1,7 +1,19 @@
 installing=0
 if [[ ! -x "/usr/local/bin/node" ]]; then
   installing=1
-  echo "Adding node.js support to nginx..."
+  echo "Adding node.js support to $WEB_SERVER..."
+  
+  test "$WEB_SERVER" == "apache" && {
+    echo ""
+    echo "  => Configuring Apache..."
+    echo ""
+
+    a2enmod proxy proxy_http   > $LOG_DIR/apache2_modules.log 2>&1
+    check_error 'configuring apache' 'apache2_modules'
+
+    /etc/init.d/apache2 reload > $LOG_DIR/apache2_reload.log 2>&1
+    check_error 'reloading apache' 'apache2_reload'
+  }
 
   echo ""
   echo "  => Installing dependencies, this will take some minutes to complete..."
@@ -96,13 +108,14 @@ allow admin:hello
   
 fi
 
-
 if [[ "$WEB_SERVER" == "apache" ]]; then
   if [ "$nodejs_proxy" == "Y" ]; then
     PHD_VIRTUALHOST_TEXT='<VirtualHost *:80>
       ServerName $host
       ServerAlias $dns_alias
+      RewriteEngine On
       ProxyPass / http://127.0.0.1:$nodejs_port
+      ProxyPassReverse / http://127.0.0.1:$nodejs_port
     </VirtualHost>'
   fi
 else
