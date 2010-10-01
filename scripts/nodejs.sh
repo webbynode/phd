@@ -112,6 +112,7 @@ allow admin:hello
   
   echo "  => Installing npm"
   
+  cd /tmp
   sudo chown -R $USER /usr/local
   curl -s http://npmjs.org/install.sh | sh > $LOG_DIR/npm.log 2>&1
   check_error 'installing npm' 'npm'
