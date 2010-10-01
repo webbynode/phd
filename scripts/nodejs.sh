@@ -98,7 +98,7 @@ allow admin:hello
   cd /tmp/node
   ./configure
   make
-  make install
+  sudo make install
   
   node=`which node`
   if [[ -z "$node" ]]; then
@@ -114,7 +114,7 @@ allow admin:hello
   
   sudo chown -R git:git /usr/local/lib/node
   
-  curl -s http://npmjs.org/install.sh | sh > $LOG_DIR/npm.log 2>&1
+  sudo curl -s http://npmjs.org/install.sh | sh > $LOG_DIR/npm.log 2>&1
   check_error 'installing npm' 'npm'
   
 fi
