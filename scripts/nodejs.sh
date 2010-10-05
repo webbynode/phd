@@ -192,7 +192,7 @@ rm /etc/monit/services/$app_name
 
 " > /var/webbynode/hooks/delete/$app_name
 
-if [ "$nodejs_proxy" == "Y" ]; then
+if [ "$nodejs_proxy" == "Y" || "$nodejs_proxy" == "y" ]; then
   configure_vhost
 fi
 
