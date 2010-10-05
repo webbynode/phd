@@ -1,3 +1,7 @@
+if [ "$nodejs_proxy" == "y" ]; then
+  nodejs_proxy=Y
+fi
+
 installing=0
 if [[ ! -x "/usr/local/bin/node" ]]; then
   installing=1
