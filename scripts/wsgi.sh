@@ -32,9 +32,11 @@ echo "Configuring WSGI application..."
 configure_vhost
 already_existed=$?
 
-echo "  => Configuring database..."
-config_app_db $app_name > $LOG_DIR/config_db.log 2>&1
-check_error 'configuring database' 'config_db'
+if [ -z "$skipdb" ]; then
+  echo "  => Configuring database..."
+  config_app_db $app_name > $LOG_DIR/config_db.log 2>&1
+  check_error 'configuring database' 'config_db'
+fi
 
 old_dir=`pwd`
 
