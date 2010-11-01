@@ -22,8 +22,10 @@ if [[ ! -d "$dir/public" ]]; then
   echo "     WARNING: Missing public folder in your Rack app, it'll not run smoothly!"
 fi
 
-echo "  => Configuring database..."
-config_app_db $app_name > $LOG_DIR/config_db.log 2>&1
+if [ -z "$skipdb" ]; then
+  echo "  => Configuring database..."
+  config_app_db $app_name > $LOG_DIR/config_db.log 2>&1
+fi
 
 check_bundler
 

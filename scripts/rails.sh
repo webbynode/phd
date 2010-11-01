@@ -32,9 +32,11 @@ fi
 configure_vhost
 already_existed=$?
 
-echo "  => Configuring database..."
-sudo config_app_db $app_name > $LOG_DIR/config_db.log 2>&1
-check_error 'configuring database' 'config_db'
+if [ -z "$skipdb" ]; then
+  echo "  => Configuring database..."
+  sudo config_app_db $app_name > $LOG_DIR/config_db.log 2>&1
+  check_error 'configuring database' 'config_db'
+fi
 
 # checks the db/username
 name=$app_name
@@ -43,9 +45,11 @@ if [ ${#name} -gt 15 ]; then
   name=$(echo $name | cut -c1-15)
 fi
 
-if [[ ! -f "$dir/config/database.yml" ]]; then
-  echo "  => Configuring database.yml..."
-  sed "s/@app_name@/$name/g" /var/webbynode/templates/rails/database.yml > $dir/config/database.yml
+if [ -z "$skipdb" ]; then
+  if [[ ! -f "$dir/config/database.yml" ]]; then
+    echo "  => Configuring database.yml..."
+    sed "s/@app_name@/$name/g" /var/webbynode/templates/rails/database.yml > $dir/config/database.yml
+  fi
 fi
 
 cd $dir
@@ -57,9 +61,11 @@ if [ "$?" == "0" ]; then
   check_error 'installing gems' 'gems_install'
 fi
 
-echo "  => Migrating database..."
-RAILS_ENV=production rake db:migrate > $LOG_DIR/db_migrate.log 2>&1
-check_error 'migrating database' 'db_migrate'
+if [ -z "$skipdb" ]; then
+  echo "  => Migrating database..."
+  RAILS_ENV=production rake db:migrate > $LOG_DIR/db_migrate.log 2>&1
+  check_error 'migrating database' 'db_migrate'
+fi
 
 sudo chown -R git:www-data * > $LOG_DIR/chown.log 2>&1
 cd -
