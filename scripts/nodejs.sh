@@ -204,9 +204,11 @@ if [ "$nodejs_proxy" == "y" ]; then
   configure_vhost
 fi
 
-echo "  => Configuring database..."
-sudo config_app_db $app_name > $LOG_DIR/config_db.log 2>&1
-check_error 'configuring database' 'config_db'
+if [ -z "$skipdb" ]; then
+  echo "  => Configuring database..."
+  sudo config_app_db $app_name > $LOG_DIR/config_db.log 2>&1
+  check_error 'configuring database' 'config_db'
+fi
 
 cd $dir
 mkdir -p $LOG_DIR/node

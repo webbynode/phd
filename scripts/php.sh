@@ -64,8 +64,10 @@ if [ $? -eq 1 ]; then
   needs_restart=n
 fi
 
-echo "  => Configuring database..."
-sudo config_app_db $app_name > $LOG_DIR/config_db.log 2>&1
+if [ -z "$skipdb" ]; then
+  echo "  => Configuring database..."
+  sudo config_app_db $app_name > $LOG_DIR/config_db.log 2>&1
+fi
 
 cd $dir
 
