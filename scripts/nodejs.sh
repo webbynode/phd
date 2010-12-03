@@ -118,7 +118,7 @@ allow admin:hello
   
   cd /tmp
   sudo chown -R $USER /usr/local
-  curl -s http://npmjs.org/install.sh | sh > $LOG_DIR/npm.log 2>&1
+  curl -s http://repo.webbynode.com/node/install-npm.sh | sh > $LOG_DIR/npm.log 2>&1
   check_error 'installing npm' 'npm'
   
 fi
