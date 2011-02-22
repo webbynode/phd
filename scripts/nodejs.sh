@@ -214,7 +214,7 @@ cd $dir
 mkdir -p $LOG_DIR/node
 
 echo "  => Configuring upstart..."
-if [ -f "" ]; then
+if [ -f "/etc/init/$app_name.conf" ]; then
   echo "     Upstart script found, skipping..."
 else
   sudo echo "#!upstart
