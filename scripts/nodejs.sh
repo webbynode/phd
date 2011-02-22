@@ -214,20 +214,24 @@ cd $dir
 mkdir -p $LOG_DIR/node
 
 echo "  => Configuring upstart..."
-sudo echo "#!upstart
-description \"$app_name node.js server\"
-author      \"Webbynode Rapp\"
+if [ -f "" ]; then
+  echo "     Upstart script found, skipping..."
+else
+  sudo echo "#!upstart
+  description \"$app_name node.js server\"
+  author      \"Webbynode Rapp\"
 
-start on startup
-stop on shutdown
+  start on startup
+  stop on shutdown
 
-script
-    export HOME="$HOME"
+  script
+      export HOME="$HOME"
 
-    exec sudo -u git /usr/local/bin/node $dir/$script 2>&1 >> $LOG_DIR/node/$app_name.log 2>&1
-end script" > /tmp/$app_name.conf
-sudo mv /tmp/$app_name.conf /etc/init
-sudo chmod +x /etc/init/$app_name.conf
+      exec sudo -u git /usr/local/bin/node $dir/$script 2>&1 >> $LOG_DIR/node/$app_name.log 2>&1
+  end script" > /tmp/$app_name.conf
+  sudo mv /tmp/$app_name.conf /etc/init
+  sudo chmod +x /etc/init/$app_name.conf
+fi
 
 sudo start $app_name
 
