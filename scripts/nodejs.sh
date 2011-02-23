@@ -276,6 +276,6 @@ else
     echo ""
     echo "  => Signaling nginx"
     echo ""
-    sudo /etc/init.d/nginx reload > $LOG_DIR/nginx_reload.log 2>&1
+    `sudo /etc/init.d/nginx reload > $LOG_DIR/nginx_reload.log 2>&1`
   fi
 fi
