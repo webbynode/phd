@@ -273,6 +273,9 @@ if [ "$installing" == "1" ]; then
   restart_webserver 0
 else
   if [[ "$WEB_SERVER" == "nginx" ]]; then
-    `sudo /etc/init.d/nginx reload` >> $LOG_DIR/nginx_reload.log 2>&1
+    echo ""
+    echo "  => Signaling nginx"
+    echo ""
+    sudo /etc/init.d/nginx reload > $LOG_DIR/nginx_reload.log 2>&1
   fi
 fi
