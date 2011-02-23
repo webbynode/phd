@@ -84,6 +84,11 @@ allow admin:hello
     exit 1
   fi
   
+  echo ""
+  echo "     ~> Successfully installed monit: (`monit -V|head -1`)"
+  echo ""
+  
+  
   echo "  => Starting monit"
   sudo /etc/init.d/monit start
   
@@ -97,9 +102,10 @@ allow admin:hello
 
   cd /tmp
   sudo apt-get -y -q install libgcrypt-dev
-  git clone git://github.com/ry/node.git
+  # git clone git://github.com/ry/node.git
+  wget http://nodejs.org/dist/node-latest.tar.gz
 
-  cd /tmp/node
+  cd /tmp/node-*
   ./configure
   make
   sudo make install
@@ -111,7 +117,12 @@ allow admin:hello
     echo ""
     exit 1
   else
-    rm -fR /tmp/node
+    echo ""
+    echo "     ~> Successfully installed node.js `node -v`"
+    echo ""
+    
+    rm /tmp/node-latest.tar.gz
+    rm -fR /tmp/node-*
   fi
   
   echo "  => Installing npm"
@@ -120,6 +131,10 @@ allow admin:hello
   sudo chown -R $USER /usr/local
   curl -s http://repo.webbynode.com/node/install-npm.sh | sh > $LOG_DIR/npm.log 2>&1
   check_error 'installing npm' 'npm'
+  
+  echo ""
+  echo "     ~> Successfully installed npm `npm -v`"
+  echo ""
   
 fi
 
