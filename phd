@@ -249,12 +249,22 @@ if [ -z "$allow_root" ]; then
     echo ""
     echo "----------------------------------------------------------------"
     echo " "
-    echo " IMPORTANT: Rapp now will disable root SSH access by default, "
-    echo "            if you want to overwrite this setting use:"
+    echo " IMPORTANT: Rapp now will disable root SSH access by default. "
+    echo ""
+    echo " If you want to overwrite this setting make sure you"
+    echo " follow this steps:"
+    echo ""
+    echo " 1. Make sure you have the latest gem version (1.0.4):"
     echo " "
-    echo '            $ wn settings add allow_root true'
+    echo '    $ wn version'
+    echo '    [Webbynode] Rapid Deployment Gem v1.0.4'
+    echo ""
+    echo " 2. If needed, update your gem:"
+    echo ""
+    echo '    $ gem install webbynode'
+    echo '    $ wn settings add allow_root true'
     echo " "
-    echo "            then run 'wn push' and root will be allowed again."
+    echo " 3. Run 'wn push' and root will be allowed again."
     echo " "
     echo "----------------------------------------------------------------"
     echo ""
