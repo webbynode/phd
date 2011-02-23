@@ -249,7 +249,7 @@ else
   sudo chmod +x /etc/init/$app_name.conf
 fi
 
-sudo start $app_name >> $LOG_DIR/node/${app_name}_start.log 2>&
+sudo start $app_name >> $LOG_DIR/node/${app_name}_start.log 2>&1
 
 echo "  => Configuring monit..."
 sudo rm /etc/monit/services/$app_name > /dev/null 2>&1
