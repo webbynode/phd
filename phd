@@ -244,12 +244,6 @@ echo ""
 if [ -z "$allow_root" ]; then
   if grep -q "PermitRootLogin yes" /etc/ssh/sshd_config; then
     sudo cp /etc/ssh/sshd_config /etc/ssh/sshd_config_backup
-    local GRAY="\[\033[1;30m\]"
-    local LIGHT_GRAY="\[\033[0;37m\]"
-    local CYAN="\[\033[0;36m\]"
-    local LIGHT_CYAN="\[\033[1;36m\]"
-    local NO_COLOUR="\[\033[0m\]"
-    
     echo ""
     echo "Security: Preventing root login..."
     echo ""
