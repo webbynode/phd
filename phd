@@ -247,6 +247,10 @@ if [ -z "$allow_root" ]; then
     echo ""
     echo "Security: Preventing root login..."
     echo ""
+    echo "IMPORTANT: Rapp now will disable root SSH access by default, if you want to"
+    echo "           overwrite this setting use 'wn settings add allow_root true' and"
+    echo "           then run 'wn push'."
+    echo ""
     sudo sed -i 's|PermitRootLogin yes|PermitRootLogin no|' /etc/ssh/sshd_config
     sudo /etc/init.d/ssh restart > $LOG_DIR/ssh_restart.log 2>&1
   fi
