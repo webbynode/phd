@@ -242,14 +242,14 @@ fi
 echo ""
 
 if [ -z "$allow_root" ]; then
-  if grep -q "PermitRootLogin yes" /etc/ssh/ssd_config; then
+  if grep -q "PermitRootLogin yes" /etc/ssh/sshd_config; then
     sudo cp /etc/ssh/sshd_config /etc/ssh/sshd_config_backup
     echo "  => Preventing root login..."
     sudo sed -i 's|PermitRootLogin yes|PermitRootLogin no|' /etc/ssh/sshd_config
     sudo /etc/init.d/ssh restart > $LOG_DIR/ssh_restart.log 2>&1
   fi
 else
-  if grep -q "PermitRootLogin no" /etc/ssh/ssd_config; then
+  if grep -q "PermitRootLogin no" /etc/ssh/sshd_config; then
     sudo cp /etc/ssh/sshd_config /etc/ssh/sshd_config_backup
     echo "  => Allowing root login..."
     sudo sed -i 's|PermitRootLogin no|PermitRootLogin yes|' /etc/ssh/sshd_config
