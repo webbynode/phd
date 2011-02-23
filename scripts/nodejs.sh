@@ -105,7 +105,7 @@ allow admin:hello
   # git clone git://github.com/ry/node.git
   wget http://nodejs.org/dist/node-latest.tar.gz
 
-  cd /tmp/node-*
+  cd /tmp/node-v*
   ./configure
   make
   sudo make install
@@ -122,7 +122,7 @@ allow admin:hello
     echo ""
     
     rm /tmp/node-latest.tar.gz
-    rm -fR /tmp/node-*
+    rm -fR /tmp/node-v*
   fi
   
   echo "  => Installing npm"
