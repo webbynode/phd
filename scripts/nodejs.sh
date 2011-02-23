@@ -103,7 +103,8 @@ allow admin:hello
   cd /tmp
   sudo apt-get -y -q install libgcrypt-dev
   # git clone git://github.com/ry/node.git
-  wget http://nodejs.org/dist/node-latest.tar.gz
+  wget -q http://nodejs.org/dist/node-latest.tar.gz
+  tar vzxf node-latest.tar.gz
 
   cd /tmp/node-v*
   ./configure
