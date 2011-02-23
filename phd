@@ -244,14 +244,22 @@ echo ""
 if [ -z "$allow_root" ]; then
   if grep -q "PermitRootLogin yes" /etc/ssh/sshd_config; then
     sudo cp /etc/ssh/sshd_config /etc/ssh/sshd_config_backup
-    echo "  => Preventing root login..."
+    local GRAY="\[\033[1;30m\]"
+    local LIGHT_GRAY="\[\033[0;37m\]"
+    local CYAN="\[\033[0;36m\]"
+    local LIGHT_CYAN="\[\033[1;36m\]"
+    local NO_COLOUR="\[\033[0m\]"
+    
+    echo ""
+    echo "Security: Preventing root login..."
+    echo ""
     sudo sed -i 's|PermitRootLogin yes|PermitRootLogin no|' /etc/ssh/sshd_config
     sudo /etc/init.d/ssh restart > $LOG_DIR/ssh_restart.log 2>&1
   fi
 else
   if grep -q "PermitRootLogin no" /etc/ssh/sshd_config; then
     sudo cp /etc/ssh/sshd_config /etc/ssh/sshd_config_backup
-    echo "  => Allowing root login..."
+    echo "Security: Allowing root login..."
     sudo sed -i 's|PermitRootLogin no|PermitRootLogin yes|' /etc/ssh/sshd_config
     sudo /etc/init.d/ssh restart > $LOG_DIR/ssh_restart.log 2>&1
   fi
