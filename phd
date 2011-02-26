@@ -252,22 +252,25 @@ if [ -z "$allow_root" ]; then
     echo " IMPORTANT: Rapp will now disable password-based root SSH "
     echo "            login access by default. "
     echo ""
-    echo " If you want to overwrite this setting follow this steps:"
+    echo " If you want to access your Webby using root and public key"
+    echo " authentication, follow this steps: "
     echo ""
-    echo " 1. Make sure you have the latest gem version (1.0.4)"
+    echo " 1. Make sure you have the latest gem version (1.0.4.2)"
     echo " "
     echo '    $ wn version'
-    echo '    [Webbynode] Rapid Deployment Gem v1.0.4'
+    echo '    [Webbynode] Rapid Deployment Gem v1.0.4.2'
     echo ""
     echo " 2. If needed, update your gem"
     echo ""
     echo '    $ gem install webbynode'
     echo ""
-    echo ' 3. Set the allow_root setting to true'
+    echo ' 3. Run the authroot command'
     echo ""
-    echo '    $ wn settings add allow_root true'
+    echo '    $ wn authroot'
+    echo "    Your local SSH Key has been added to your Webby's root user"
     echo " "
-    echo " 4. Run 'wn push' and root will be allowed again."
+    echo " Now you'll be able to log into your Webby as root without"
+    echo " typing a password."
     echo " "
     echo "----------------------------------------------------------------"
     echo ""
