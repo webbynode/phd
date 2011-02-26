@@ -20,7 +20,7 @@ else
 
 fi
 
-echo "Configuring static application..."
+echo "Configuring html application..."
 needs_restart=y
 configure_vhost
 if [ $? -eq 1 ]; then
