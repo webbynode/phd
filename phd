@@ -52,14 +52,13 @@ else
   WEB_SERVER_ROOT='/etc/apache2'
 fi
 
+PHD_VIRTUALHOSTS="/var/webbynode/sites"
 if [[ "$WEB_SERVER" == "nginx" ]]; then
   # default nginx virtualhosts path
-  PHD_VIRTUALHOSTS="$WEB_SERVER_ROOT/phd-sites"
   PHD_CONFIG="$WEB_SERVER_ROOT/conf/nginx.conf"
   PHD_INCLUDE="include $PHD_VIRTUALHOSTS/*;"
 else
   # default apache virtualhosts path
-  PHD_VIRTUALHOSTS='/etc/apache2/phd-sites'
   PHD_CONFIG='/etc/apache2/apache2.conf'
   PHD_INCLUDE="Include $PHD_VIRTUALHOSTS"
 fi
