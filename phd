@@ -12,10 +12,10 @@ fi
 PHD_ROOT=/var/webbynode/phd
 LOG_DIR=/var/webbynode/log
 
-if [ ! -d $LOG_DIR ]; then
-  sudo mkdir -p $LOG_DIR
-  sudo chown -R git:www-data $LOG_DIR
-fi
+# if [ ! -d $LOG_DIR ]; then
+#   sudo mkdir -p $LOG_DIR
+#   sudo chown -R git:www-data $LOG_DIR
+# fi
 
 dir=$(dirname $1)
 host=$3
@@ -52,7 +52,7 @@ else
   WEB_SERVER_ROOT='/etc/apache2'
 fi
 
-PHD_VIRTUALHOSTS="/var/webbynode/sites"
+PHD_VIRTUALHOSTS="/var/webbynode/vhosts"
 if [[ "$WEB_SERVER" == "nginx" ]]; then
   # default nginx virtualhosts path
   PHD_CONFIG="$WEB_SERVER_ROOT/conf/nginx.conf"

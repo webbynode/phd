@@ -17,7 +17,7 @@ fi
 
 test -z "$WEB_SERVER_CONFIG" && WEB_SERVER_CONFIG="$WEB_SERVER_ROOT"
 
-PHD_VIRTUALHOSTS='/var/webbynode/sites'
+PHD_VIRTUALHOSTS='/var/webbynode/vhosts'
 
 if [[ "$WEB_SERVER" == "nginx" ]]; then
   # default nginx virtualhosts path
