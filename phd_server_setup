@@ -4,6 +4,7 @@ if [[ -d "/opt/nginx" ]]; then
   echo "Nginx+Passenger webserver detected..."
   WEB_SERVER="nginx"
   WEB_SERVER_ROOT="/opt/nginx"
+  WEB_SERVER_CONFIG="$WEB_SERVER_ROOT/conf"
 elif [[ -d '/etc/nginx' ]]; then
   echo "Nginx webserver detected..."
   WEB_SERVER="nginx"
@@ -14,11 +15,13 @@ else
   WEB_SERVER_ROOT='/etc/apache2'
 fi
 
+test -z "$WEB_SERVER_CONFIG" && WEB_SERVER_CONFIG="$WEB_SERVER_ROOT"
+
 PHD_VIRTUALHOSTS='/var/webbynode/sites'
 
 if [[ "$WEB_SERVER" == "nginx" ]]; then
   # default nginx virtualhosts path
-  PHD_CONFIG="$WEB_SERVER_ROOT/conf/nginx.conf"
+  PHD_CONFIG="$WEB_SERVER_CONFIG/nginx.conf"
   PHD_INCLUDE="  include $PHD_VIRTUALHOSTS/*;"
 else
   # default apache virtualhosts path
