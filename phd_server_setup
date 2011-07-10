@@ -58,7 +58,7 @@ fi
 
 if [[ -z "$( grep '$PHD_INCLUDE' $PHD_CONFIG )" ]]; then
 	echo "Including virtualhosts in configuration"
-	echo $PHD_INCLUDE >> $PHD_CONFIG
+	echo "\n$PHD_INCLUDE" >> $PHD_CONFIG
 fi
 
 ln -s /var/webbynode/phd/phd /usr/bin/phd
