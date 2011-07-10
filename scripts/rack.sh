@@ -4,6 +4,10 @@ if [[ "$WEB_SERVER" == "apache" ]]; then
     ServerAlias $dns_alias
     DocumentRoot $dir/public
     PassengerAppRoot $dir
+    <Directory $dir>
+       AllowOverride all
+       Options -MultiViews
+    </Directory>
   </VirtualHost>'
 else
   PHD_VIRTUALHOST_TEXT='server {

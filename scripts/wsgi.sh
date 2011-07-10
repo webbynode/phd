@@ -17,6 +17,10 @@ if [[ "$WEB_SERVER" == "apache" ]]; then
     ServerName $host
     ServerAlias $dns_alias
     DocumentRoot $dir
+    <Directory $dir>
+       AllowOverride all
+       Options -MultiViews
+    </Directory>
   </VirtualHost>'
 else
   PHD_VIRTUALHOST_TEXT='server {
