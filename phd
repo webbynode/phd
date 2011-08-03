@@ -189,7 +189,7 @@ configure_apache_vhost() {
 	  
 		PHD_VIRTUALHOST_TEXT="echo \"$PHD_VIRTUALHOST_TEXT\""
 		eval "$PHD_VIRTUALHOST_TEXT" > $PHD_VIRTUALHOSTS/$host
-		echo "$host" >> /var/webbynode/mappings/$app_name.conf
+		echo "$host" > /var/webbynode/mappings/$app_name.conf
 		return 0
 	fi
 }
@@ -203,7 +203,7 @@ configure_nginx_vhost() {
 	  
 		PHD_VIRTUALHOST_TEXT="echo \"$PHD_VIRTUALHOST_TEXT\""
 		eval "$PHD_VIRTUALHOST_TEXT" > $PHD_VIRTUALHOSTS/$host
-		echo "$host" >> /var/webbynode/mappings/$app_name.conf
+		echo "$host" > /var/webbynode/mappings/$app_name.conf
 		return 0
 	fi
 }
