@@ -65,6 +65,7 @@ else
 fi
 
 PUSHAND_INSTALL_DIR=~/tmp
+SEMAPHORE="/var/webbynode/semaphores/recreate_$app_name"
 
 sudo mkdir -p /var/log/phd
 sudo chown -R git:www-data /var/log/phd
@@ -167,11 +168,25 @@ check_bundler() {
   return 0
 }
 
+check_and_remove_semaphore() {
+  if [[ -f $SEMAPHORE ]]; then
+		rm "$SEMAPHORE"
+
+    if [[ -z "$dns_alias" ]]; then
+  		echo "     Recreating vhost with no aliases..."
+    else
+  		echo "     Recreating vhost with aliases: $dns_alias..."
+		fi
+  fi
+}
+
 configure_apache_vhost() {
-  if [[ -f "$PHD_VIRTUALHOSTS/$host" ]]; then
+  if [[ -f "$PHD_VIRTUALHOSTS/$host" ]] && [[ ! -f "$SEMAPHORE" ]]; then
 		echo '     Already configured!'
 		return 1
 	else
+	  check_and_remove_semaphore
+	  
 		PHD_VIRTUALHOST_TEXT="echo \"$PHD_VIRTUALHOST_TEXT\""
 		eval "$PHD_VIRTUALHOST_TEXT" > $PHD_VIRTUALHOSTS/$host
 		echo "$host" >> /var/webbynode/mappings/$app_name.conf
@@ -180,10 +195,12 @@ configure_apache_vhost() {
 }
 
 configure_nginx_vhost() {
-  if [[ -f "$PHD_VIRTUALHOSTS/$host" ]]; then
+  if [[ -f "$PHD_VIRTUALHOSTS/$host" ]] && [[ ! -f "$SEMAPHORE" ]]; then
 		echo '     Already configured!'
 		return 1
 	else
+	  check_and_remove_semaphore
+	  
 		PHD_VIRTUALHOST_TEXT="echo \"$PHD_VIRTUALHOST_TEXT\""
 		eval "$PHD_VIRTUALHOST_TEXT" > $PHD_VIRTUALHOSTS/$host
 		echo "$host" >> /var/webbynode/mappings/$app_name.conf
