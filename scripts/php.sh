@@ -1,6 +1,7 @@
 if [[ "$WEB_SERVER" == "apache" ]]; then
   PHD_VIRTUALHOST_TEXT='<VirtualHost *:80>
     ServerName $host
+    ServerAlias $dns_alias
     DocumentRoot $dir
     DirectoryIndex index.php index.html index.htm
   </VirtualHost>'
@@ -17,7 +18,7 @@ if [[ "$WEB_SERVER" == "apache" ]]; then
 else
   PHD_VIRTUALHOST_TEXT='server {
       listen 80;
-      server_name $host;
+      server_name $host $dns_alias;
       
       location / {
               root   $dir;
