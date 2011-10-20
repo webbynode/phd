@@ -324,20 +324,24 @@ if [[ ! -z "addons" ]]; then
   echo ""
 fi
 
-if [[ ! -z "$engine" ]]; then
-  if [[ ! -f "$PHD_ROOT/scripts/$engine.sh" ]]; then
-    echo "Missing support for engine: $engine. Aborting."
-    exit
-  else
-    . $PHD_ROOT/scripts/$engine.sh
-  fi
+if [[ -f "$dir/Procfile" ]]; then
+  . $PHD_ROOT/scripts/foreman.sh
 else
-  if [[ -d "$dir/app" && -d "$dir/app/controllers" && -f "$dir/config/environment.rb" ]]; then
-    . $PHD_ROOT/scripts/rails.sh
-  elif [[ -f "$dir/config.ru" ]]; then
-    . $PHD_ROOT/scripts/rack.sh
+  if [[ ! -z "$engine" ]]; then
+    if [[ ! -f "$PHD_ROOT/scripts/$engine.sh" ]]; then
+      echo "Missing support for engine: $engine. Aborting."
+      exit
+    else
+      . $PHD_ROOT/scripts/$engine.sh
+    fi
   else
-    echo "WARNING: Didn't detect what application engine you're using."
+    if [[ -d "$dir/app" && -d "$dir/app/controllers" && -f "$dir/config/environment.rb" ]]; then
+      . $PHD_ROOT/scripts/rails.sh
+    elif [[ -f "$dir/config.ru" ]]; then
+      . $PHD_ROOT/scripts/rack.sh
+    else
+      echo "WARNING: Didn't detect what application engine you're using."
+    fi
   fi
 fi
 
