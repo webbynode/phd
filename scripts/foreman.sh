@@ -8,6 +8,7 @@ if [[ "$WEB_SERVER" == "apache" ]]; then
 else
   PHD_VIRTUALHOST_TEXT='upstream $app_name {
     server 127.0.0.1:5000;
+    server 127.0.0.1:5001;
   }
   
   server {
@@ -58,8 +59,8 @@ if [ -f "Gemfile" ]; then
   check_error 'bundling gems' 'bundler'
 fi
 
-sudo foreman export upstart /etc/init -u root -a $app_name
-sudo stop $app_name >> $LOG_DIR/upstart_$app_name.log 2>&1
+sudo foreman export upstart /etc/init -c web=2 -u root -a $app_name
+sudo stop  $app_name >> $LOG_DIR/upstart_$app_name.log 2>&1
 sudo start $app_name
 
 configure_vhost
