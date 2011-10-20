@@ -37,6 +37,12 @@ fi
 
 echo "Configuring application processes..."
 
+rails2=`gem list rails | grep rails | grep \(3`
+if [ "$?" == "1" ]; then
+  echo "  => Missing bundler gem, installing..."
+  sudo gem install bundler > $LOG_DIR/bundler_install.log 2>&1
+end
+
 foreman_gem=`gem list foreman | grep foreman`
 if [ "$?" == "1" ]; then
   echo "  => Missing foreman gem, installing..."
