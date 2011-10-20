@@ -56,7 +56,7 @@ if [ -f "Gemfile" ]; then
   check_error 'bundling gems' 'bundler'
 fi
 
-foreman export upstart /etc/init -a $app_name
+sudo foreman export upstart /etc/init -a $app_name
 
 echo PORT: $PORT
 
