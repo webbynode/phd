@@ -7,7 +7,7 @@ if [[ "$WEB_SERVER" == "apache" ]]; then
   </VirtualHost>'
 else
   PHD_VIRTUALHOST_TEXT='upstream $app_name {
-    server 127.0.0.1:5000
+    server 127.0.0.1:5000;
   }
   
   server {
@@ -19,7 +19,7 @@ else
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_set_header Host \$http_host;
-        proxy_redirect false;
+        proxy_redirect off;
 
         if (-f $request_filename/index.html) {
           rewrite (.*) \$1/index.html break;
