@@ -35,6 +35,8 @@ else
   }'
 fi
 
+cd $dir
+
 echo "Configuring application processes..."
 
 rails2=`gem list bundler | grep bundler`
@@ -57,8 +59,8 @@ if [ -f "Gemfile" ]; then
 fi
 
 sudo foreman export upstart /etc/init -u root -a $app_name
-sudo stop testapp >> $LOG_DIR/upstart_$app_name.log
-sudo start testapp
+sudo stop $app_name >> $LOG_DIR/upstart_$app_name.log 2>&1
+sudo start $app_name
 
 configure_vhost
 already_existed=$?
