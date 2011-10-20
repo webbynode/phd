@@ -38,12 +38,6 @@ fi
 echo "Configuring application processes..."
 
 foreman_gem=`gem list foreman | grep foreman`
-if [ "$?" == "1" ]
-
-configure_vhost
-already_existed=$?
-
-rails2=`gem list rails | grep rails | grep \(3`
 if [ "$?" == "1" ]; then
   echo "  => Missing foreman gem, installing..."
   sudo gem install foreman > $LOG_DIR/foreman_install.log 2>&1
@@ -57,6 +51,11 @@ if [ -f "Gemfile" ]; then
 fi
 
 foreman export upstart /etc/init -a $app_name
+
+echo PORT: $PORT
+
+configure_vhost
+already_existed=$?
 
 sudo chown -R git:www-data * > $LOG_DIR/chown.log 2>&1
 cd -
