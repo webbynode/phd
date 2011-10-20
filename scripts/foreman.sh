@@ -37,7 +37,7 @@ fi
 
 echo "Configuring application processes..."
 
-rails2=`gem list rails | grep rails | grep \(3`
+rails2=`gem list bundler | grep bundler`
 if [ "$?" == "1" ]; then
   echo "  => Missing bundler gem, installing..."
   sudo gem install bundler > $LOG_DIR/bundler_install.log 2>&1
@@ -56,9 +56,9 @@ if [ -f "Gemfile" ]; then
   check_error 'bundling gems' 'bundler'
 fi
 
-sudo foreman export upstart /etc/init -a $app_name
-
-echo PORT: $PORT
+sudo foreman export upstart /etc/init -u root -a $app_name
+sudo stop testapp >> $LOG_DIR/upstart_$app_name.log
+sudo start testapp
 
 configure_vhost
 already_existed=$?
