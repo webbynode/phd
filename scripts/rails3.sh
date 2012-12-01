@@ -19,14 +19,14 @@ echo "Configuring Rails 3 application..."
 configure_vhost
 already_existed=$?
 
-rails2=`gem list rails | grep rails | grep \(3`
-if [ "$?" == "1" ]; then
-  echo "  => Missing Rails 3 gems, installing..."
-  sudo apt-get install -q -y libpq-dev > $LOG_DIR/rails3_prereq.log 2>&1
+# rails2=`gem list rails | grep rails | grep \(3`
+# if [ "$?" == "1" ]; then
+#   echo "  => Missing Rails 3 gems, installing..."
+#   sudo apt-get install -q -y libpq-dev > $LOG_DIR/rails3_prereq.log 2>&1
   
-  sudo gem install tzinfo builder memcache-client rack rack-test rack-mount erubis mail text-format thor bundler i18n rake --source http://rubygems.org/  > $LOG_DIR/rails3_install.log 2>&1
-  sudo gem install rails --source http://rubygems.org/ > $LOG_DIR/rails3_install.log 2>&1
-fi
+#   sudo gem install tzinfo builder memcache-client rack rack-test rack-mount erubis mail text-format thor bundler i18n rake --source http://rubygems.org/  > $LOG_DIR/rails3_install.log 2>&1
+#   sudo gem install rails --source http://rubygems.org/ > $LOG_DIR/rails3_install.log 2>&1
+# fi
 
 if [ -z "$skipdb" ]; then
   echo "  => Configuring database..."
