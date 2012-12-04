@@ -4,6 +4,8 @@
 #
 # eventually, it might be `phd run [app]` if phd gets more sophisticated
 
+source /usr/bin/load_env
+
 if [[ -z "$1" ]]; then
 	echo "Usage: phd [application's .git directory] [hostname]" 
 	exit
@@ -38,32 +40,11 @@ echo "  Webbynode git deployment "
 echo "----------------------------"
 echo ""
 
-if [[ -d "/opt/nginx" ]]; then
-  echo "Nginx+Passenger webserver detected..."
-  WEB_SERVER="nginx"
-  WEB_SERVER_ROOT="/opt/nginx"
-elif [[ -d '/etc/nginx' ]]; then
-  echo "Nginx webserver detected..."
-  WEB_SERVER="nginx"
-  WEB_SERVER_ROOT="/etc/nginx"
-else
-  echo "Apache webserver detected..."
-  WEB_SERVER="apache"
-  WEB_SERVER_ROOT='/etc/apache2'
-fi
+WEB_SERVER="$WEBSERVER_NAME"
+WEB_SERVER_ROOT="$WEBSERVER_PATH"
 
-if [[ "$WEB_SERVER" == "nginx" ]]; then
-  # default nginx virtualhosts path
-  # PHD_VIRTUALHOSTS="$WEB_SERVER_ROOT/phd-sites"
-  PHD_VIRTUALHOSTS="/var/webbynode/vhosts"
-  PHD_CONFIG="$WEB_SERVER_ROOT/conf/nginx.conf"
-  PHD_INCLUDE="include $PHD_VIRTUALHOSTS/*;"
-else
-  # default apache virtualhosts path
-  PHD_VIRTUALHOSTS="/var/webbynode/vhosts"
-  PHD_CONFIG='/etc/apache2/apache2.conf'
-  PHD_INCLUDE="Include $PHD_VIRTUALHOSTS"
-fi
+PHD_VIRTUALHOSTS="/var/webbynode/vhosts"
+PHD_CONFIG="$WEB_SERVER_ROOT/conf/nginx.conf"
 
 PUSHAND_INSTALL_DIR=~/tmp
 SEMAPHORE="/var/webbynode/semaphores/recreate_$app_name"
@@ -95,6 +76,10 @@ if [[ -f /var/webbynode/mappings/$app_name.conf ]]; then
 fi
 
 echo "Deploying application $app_name as $host..."
+
+expand_env_template() {
+  eval "echo \"`cat $1`\""
+}
 
 add_on() {
   echo "  => Installing addon $1"
