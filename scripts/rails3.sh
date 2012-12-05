@@ -53,7 +53,6 @@ if [ -z "$skipdb" ]; then
       echo "     using adapter: ${rails3_adapter}"
       sed -i "s/adapter: mysql/adapter: ${rails3_adapter}/g" $dir/config/database.yml
     fi
-    chmod git:www-data /var/webbynode/templates/rails/database.yml
   fi
 fi
 
