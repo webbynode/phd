@@ -46,12 +46,10 @@ if [ -z "$skipdb" ]; then
     echo "  => Configuring database.yml..."
     expand_env_template "/var/webbynode/templates/rails/database.yml" > $dir/config/database.yml
     sed -i "s/@app_name@/$name/g" $dir/config/database.yml
-    if grep mysql2 $dir/Gemfile >/dev/null 2>&1; then
-      sed -i "s/adapter: mysql/adapter: mysql2/g" $dir/config/database.yml
-    fi
+
     if [[ ! -z "${rails3_adapter}" ]]; then
       echo "     using adapter: ${rails3_adapter}"
-      sed -i "s/adapter: mysql/adapter: ${rails3_adapter}/g" $dir/config/database.yml
+      sed -i "s/adapter: mysql$/adapter: ${rails3_adapter}/g" $dir/config/database.yml
     fi
   fi
 fi
