@@ -56,7 +56,7 @@ if [[ ! "$base" =~ "." ]]; then
   ip=`ifconfig | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $1}'`
   echo "Setting up DNS..."
   echo ""
-  output=`curl -s https://manager2.webbynode.com/api/domain.json?ip=$ip\&app_name=$base -d ''`
+  output=`curl -s -X PUT https://manager2.webbynode.com/api/domain.json?ip=$ip\&app_name=$base -d ''`
 
   if [ "$?" != "0" ]; then
     echo "$output" >> /var/webbynode/log/domain_error.log
