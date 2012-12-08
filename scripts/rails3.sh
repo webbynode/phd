@@ -1,3 +1,10 @@
+function rake_task_defined {
+  old_dir=$PWD
+  cd $dir
+  bundle exec rake $1 --dry-run >/dev/null 2>&1
+  cd $old_dir
+}
+
 if [[ "$WEB_SERVER" == "apache" ]]; then
   PHD_VIRTUALHOST_TEXT='<VirtualHost *:80>
     ServerName $host
@@ -81,6 +88,18 @@ if [ -z "$skipdb" ]; then
   echo "  => Migrating database..."
   RAILS_ENV=production bundle exec rake db:migrate > $LOG_DIR/db_migrate.log 2>&1
   check_error 'migrating database' 'db_migrate'
+fi
+
+if rake_task_defined "assets:precompile"; then
+  if [ -f $dir/public/assets/manifest.yml ]; then
+    echo "  => Detected manifest.yml, assuming assets were compiled locally"
+  else
+    echo "  => Precompiling assets..."
+    RAILS_GROUPS=assets
+    RAILS_ENV=production
+    bundle exec rake assets:precompile > $LOG_DIR/assets_precompile.log 2>&1
+    check_error 'precompiling assets' 'assets_precompile'
+  fi
 fi
 
 sudo chown -R git:www-data * > $LOG_DIR/chown.log 2>&1
