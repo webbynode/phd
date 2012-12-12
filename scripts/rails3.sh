@@ -91,15 +91,11 @@ if [ -z "$skipdb" ]; then
 fi
 
 if rake_task_defined "assets:precompile"; then
-  if [ -f $dir/public/assets/manifest.yml ]; then
-    echo "  => Detected manifest.yml, assuming assets were compiled locally"
-  else
-    echo "  => Precompiling assets..."
-    RAILS_GROUPS=assets
-    RAILS_ENV=production
-    bundle exec rake assets:precompile > $LOG_DIR/assets_precompile.log 2>&1
-    check_error 'precompiling assets' 'assets_precompile'
-  fi
+  echo "  => Precompiling assets..."
+  RAILS_GROUPS=assets
+  RAILS_ENV=production
+  bundle exec rake assets:precompile > $LOG_DIR/assets_precompile.log 2>&1
+  check_error 'precompiling assets' 'assets_precompile'
 fi
 
 sudo chown -R git:www-data * > $LOG_DIR/chown.log 2>&1
