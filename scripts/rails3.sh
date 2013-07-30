@@ -98,6 +98,35 @@ if rake_task_defined "assets:precompile"; then
   check_error 'precompiling assets' 'assets_precompile'
 fi
 
+if [ -f $dir/Procfile ]; then
+  echo "  => Setting environment variables..."
+  cd /var/webbynode/env
+  for f in *; do
+     if [ ! -d /var/webbynode/env/$f ]; then
+        contents=`cat /var/webbynode/env/$f`
+        [ -z $contents ] || echo "$f=$(cat /var/webbynode/env/$f)" >> $dir/.env
+     fi
+  done
+
+  if [ -d /var/webbynode/env/$app_name ]; then
+    cd /var/webbynode/env/$app_name
+    for f in *; do
+       contents=`cat /var/webbbynode/env/$app_name/$f`
+       [ -s /var/webbynode/env/$app_name/$f ]] || [ -z $contents ] || echo "$f=$(cat /var/webbynode/env/$app_name/$f)" >> $dir/.env
+    done
+  fi
+
+  echo "  => Stopping application..."
+  sudo stop $app_name > /dev/null 2>&1
+
+  echo "  => Setting up processes..."
+  cd $dir
+  sudo foreman export upstart /etc/init -a "$app_name" -u git
+
+  echo "  => Starting processes..."
+  sudo start $app_name
+fi
+
 sudo chown -R git:www-data * > $LOG_DIR/chown.log 2>&1
 cd -
 
