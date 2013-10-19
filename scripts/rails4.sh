@@ -83,9 +83,7 @@ fi
 
 if rake_task_defined "assets:precompile"; then
   echo "  => Precompiling assets..."
-  RAILS_GROUPS=assets
-  RAILS_ENV=production
-  bundle exec rake assets:precompile > $LOG_DIR/assets_precompile.log 2>&1
+  bundle exec rake assets:precompile RAILS_GROUPS=assets RAILS_ENV=production > $LOG_DIR/assets_precompile.log 2>&1
   check_error 'precompiling assets' 'assets_precompile'
 fi
 
