@@ -57,7 +57,7 @@ echo "  => Bundling gems..."
 unset GIT_DIR && bundle install --without test development > $LOG_DIR/bundler.log 2>&1
 check_error 'bundling gems' 'bundler'
 
-ruby -e "require 'rubygems'; require 'bundler'" -e "sqlite3 = Bundler.definition.dependencies.select { |d| d.name == 'sqlite3-ruby' }.first; exit(0) unless sqlite3; groups = sqlite3.groups - [:test, :development]; if groups.any?; exit(1); else; exit(0); end" > $LOG_DIR/check_sqlite3.log 2>&1
+ruby -e "require 'rubygems'; require 'bundler'" -e "sqlite3 = Bundler.definition.dependencies.select { |d| d.name == 'sqlite3' }.first; exit(0) unless sqlite3; groups = sqlite3.groups - [:test, :development]; if groups.any?; exit(1); else; exit(0); end" > $LOG_DIR/check_sqlite3.log 2>&1
 
 if [ $? -eq 1 ]; then
   echo ""
@@ -65,7 +65,7 @@ if [ $? -eq 1 ]; then
   echo "    W A R N I N G "
   echo "---------------------"
   echo ""
-  echo "It seems that you have sqlite3-ruby gem listed in your Gemfile. Please visit the URL:"
+  echo "It seems that you have sqlite3 gem listed in your Gemfile. Please visit the URL:"
   echo ""
   echo "   http://guides.webbynode.com/articles/rapidapps/rails3warning.html"
   echo ""
