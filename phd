@@ -246,6 +246,12 @@ restart_webserver() {
 
 handle_procfile() {
   if [ -f $dir/Procfile ]; then
+    echo "  => Overriding vhost..."
+    eval "cat <<EOF
+$(</var/webbynode/phd/templates/procfile_nginx)
+EOF
+" 2> /dev/null > $PHD_VIRTUALHOSTS/$host
+
     echo "  => Setting environment variables..."
     cd /var/webbynode/env
     if [ -f $dir/.env ]; then

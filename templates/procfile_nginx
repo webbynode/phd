@@ -1,0 +1,46 @@
+upstream ${app_name}_server {
+    server 127.0.0.1:5000;
+}
+
+server {
+    listen 80;
+    server_name $host $dns_alias;
+    root $dir;
+
+    client_body_in_file_only clean;
+    client_body_buffer_size 32K;
+
+    client_max_body_size 300M;
+
+    sendfile on;
+    send_timeout 300s;
+
+    if (-f $document_root/maintenance.html) {
+      return 503;
+    }
+
+    error_page 503 @maintenance;
+    location @maintenance {
+        rewrite ^(.*) /maintenance.html break;
+    }
+
+    keepalive_timeout 5;
+
+    location / {
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header Host $http_host;
+      proxy_redirect off;
+
+      # If you don't find the filename in the static files
+      # Then request it from the unicorn server
+      if (!-f $request_filename) {
+        proxy_pass http://${app_name}_server;
+        break;
+      }
+    }
+
+    error_page 500 502 503 504 /500.html;
+    location = /500.html {
+        root $dir/public;
+    }
+}
