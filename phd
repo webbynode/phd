@@ -258,8 +258,8 @@ handle_procfile() {
     if [ -d /var/webbynode/env/$app_name ]; then
       cd /var/webbynode/env/$app_name
       for f in *; do
-         contents=`cat /var/webbbynode/env/$app_name/$f`
-         [ -s /var/webbynode/env/$app_name/$f ]] || [ -z $contents ] || echo "$f=$(cat /var/webbynode/env/$app_name/$f)" >> $dir/.env
+         contents=`cat /var/webbynode/env/$app_name/$f`
+         [ -s /var/webbynode/env/$app_name/$f ] || [ -z $contents ] || echo "$f=$(cat /var/webbynode/env/$app_name/$f)" >> $dir/.env
       done
     fi
 
