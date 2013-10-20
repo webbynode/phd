@@ -7,7 +7,7 @@
 source /usr/bin/load_env
 
 if [[ -z "$1" ]]; then
-	echo "Usage: phd [application's .git directory] [hostname]" 
+	echo "Usage: phd [application's .git directory] [hostname]"
 	exit
 fi
 
@@ -74,10 +74,10 @@ if [[ -f /var/webbynode/mappings/$app_name.conf ]]; then
     echo "Application dns entry changed from $app_dns to $host"
     echo "  => Fixing mapping"
     rm /var/webbynode/mappings/$app_name.conf
-    
+
     echo "  => Removing vHost for $app_dns"
     rm $PHD_VIRTUALHOSTS/$app_dns
-    
+
     echo ""
   fi
 fi
@@ -93,7 +93,7 @@ add_on() {
 }
 
 add_on_status() {
-  echo "     $1..."  
+  echo "     $1..."
 }
 
 add_on_wait() {
@@ -127,16 +127,16 @@ check_installed() {
 
 install_if_needed() {
   check_installed $1
-  
+
   if [ "$installed" == "n" ]; then
     add_on_wait "Installing $1"
     sudo apt-get install -y -q $1 2>&1 | sed 's/^/     /' > $LOG_DIR/$1-install.log 2>&1
-    
+
     if [ "$?" != "0" ]; then
       add_on_status "WARNING: There was an error installing $1."
       add_on_status "         Please check $LOG_DIR/$1-install.log for installation logs."
     fi
-    
+
     if [ ! -z "$2" ]; then
       `$2`
     fi
@@ -151,13 +151,13 @@ check_bundler() {
     sudo gem install bundler --pre >> $LOG_DIR/bundler_install.log 2>&1
     sudo gem install bundler >> $LOG_DIR/bundler_install.log 2>&1
   fi
-  
+
   if [ -f Gemfile ]; then
     echo "  => Bundling gems..."
     unset GIT_DIR && bundle install --without test development > $LOG_DIR/bundler.log 2>&1
     return 1
   fi
-  
+
   return 0
 }
 
@@ -179,7 +179,7 @@ configure_apache_vhost() {
 		return 1
 	else
 	  check_and_remove_semaphore
-	  
+
 		PHD_VIRTUALHOST_TEXT="echo \"$PHD_VIRTUALHOST_TEXT\""
 		eval "$PHD_VIRTUALHOST_TEXT" > $PHD_VIRTUALHOSTS/$host
 		echo "$host" > /var/webbynode/mappings/$app_name.conf
@@ -193,7 +193,7 @@ configure_nginx_vhost() {
 		return 1
 	else
 	  check_and_remove_semaphore
-	  
+
 		PHD_VIRTUALHOST_TEXT="echo \"$PHD_VIRTUALHOST_TEXT\""
 		eval "$PHD_VIRTUALHOST_TEXT" > $PHD_VIRTUALHOSTS/$host
 		echo "$host" > /var/webbynode/mappings/$app_name.conf
@@ -212,17 +212,17 @@ configure_vhost() {
     host=${host#*.}
     wildcard=1
   fi
-  
+
   if [[ "$WEB_SERVER" == "nginx" ]]; then
     configure_nginx_vhost
   else
     configure_apache_vhost
   fi
-  
+
   if [ $wildcard == 1 ]; then
     host=$dns_alias
   fi
-  
+
   return $?
 }
 
@@ -244,8 +244,54 @@ restart_webserver() {
   fi
 }
 
+handle_procfile() {
+  if [ -f $dir/Procfile ]; then
+    echo "  => Setting environment variables..."
+    cd /var/webbynode/env
+    for f in *; do
+       if [ ! -d /var/webbynode/env/$f ]; then
+          contents=`cat /var/webbynode/env/$f`
+          [ -z $contents ] || echo "$f=$(cat /var/webbynode/env/$f)" >> $dir/.env
+       fi
+    done
+
+    if [ -d /var/webbynode/env/$app_name ]; then
+      cd /var/webbynode/env/$app_name
+      for f in *; do
+         contents=`cat /var/webbbynode/env/$app_name/$f`
+         [ -s /var/webbynode/env/$app_name/$f ]] || [ -z $contents ] || echo "$f=$(cat /var/webbynode/env/$app_name/$f)" >> $dir/.env
+      done
+    fi
+
+    echo "  => Stopping application..."
+    sudo stop $app_name > /dev/null 2>&1
+
+    echo "  => Setting up processes..."
+    cd $dir
+    sudo foreman export upstart /etc/init -a "$app_name" -u git
+
+    echo "  => Starting processes..."
+    sudo start $app_name
+  fi
+}
+
+function rake_task_defined {
+  old_dir=$PWD
+  cd $dir
+  bundle exec rake $1 --dry-run >/dev/null 2>&1
+  cd $old_dir
+}
+
+handle_assets_precompile() {
+  if rake_task_defined "assets:precompile"; then
+    echo "  => Precompiling assets..."
+    bundle exec rake assets:precompile RAILS_GROUPS=assets RAILS_ENV=production > $LOG_DIR/assets_precompile.log 2>&1
+    check_error 'precompiling assets' 'assets_precompile'
+  fi
+}
+
 if [[ -f "$dir/.webbynode/settings" ]]; then
-  vars=`cat $dir/.webbynode/settings` 
+  vars=`cat $dir/.webbynode/settings`
   eval $vars
 fi
 
@@ -287,7 +333,7 @@ if [ -z "$allow_root" ]; then
     sudo sed -i 's|PermitRootLogin yes|PermitRootLogin without-password|g' /etc/ssh/sshd_config
     sudo /etc/init.d/ssh restart > $LOG_DIR/ssh_restart.log 2>&1
   fi
-  
+
   if grep -q "PermitRootLogin no" /etc/ssh/sshd_config; then
     sudo sed -i 's|PermitRootLogin no|PermitRootLogin without-password|g' /etc/ssh/sshd_config
     sudo /etc/init.d/ssh restart > $LOG_DIR/ssh_restart.log 2>&1
@@ -305,7 +351,7 @@ fi
 
 if [[ ! -z "addons" ]]; then
   echo "Configuring addons..."
-  
+
   for addon in ${addons[@]}; do
     if [[ ! -f "$PHD_ROOT/scripts/addons/$addon.sh" ]]; then
       echo "WARNING: Missing support for addon: $addon. Skipping"
@@ -313,7 +359,7 @@ if [[ ! -z "addons" ]]; then
       . $PHD_ROOT/scripts/addons/$addon.sh
     fi
   done
-  
+
   echo ""
 fi
 

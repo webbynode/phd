@@ -1,10 +1,3 @@
-function rake_task_defined {
-  old_dir=$PWD
-  cd $dir
-  bundle exec rake $1 --dry-run >/dev/null 2>&1
-  cd $old_dir
-}
-
 if [[ "$WEB_SERVER" == "apache" ]]; then
   PHD_VIRTUALHOST_TEXT='<VirtualHost *:80>
     ServerName $host
@@ -45,9 +38,11 @@ if [ -z "$skipdb" ]; then
     expand_env_template "/var/webbynode/templates/rails/database_$DB_ENGINE.yml" > $dir/config/database.yml
     sed -i "s/@app_name@/$name/g" $dir/config/database.yml
 
-    if [[ ! -z "${rails4_adapter}" ]]; then
-      echo "     using adapter: ${rails4_adapter}"
-      sed -i "s/adapter: mysql$/adapter: ${rails4_adapter}/g" $dir/config/database.yml
+    adapter="${rails4_adapter-mysql2}"
+
+    if [[ ! -z "${adapter}" ]]; then
+      echo "     using adapter: ${adapter}"
+      sed -i "s/adapter: mysql$/adapter: ${adapter}/g" $dir/config/database.yml
     fi
   fi
 fi
@@ -81,12 +76,8 @@ if [ -z "$skipdb" ]; then
   check_error 'migrating database' 'db_migrate'
 fi
 
-if rake_task_defined "assets:precompile"; then
-  echo "  => Precompiling assets..."
-  bundle exec rake assets:precompile RAILS_GROUPS=assets RAILS_ENV=production > $LOG_DIR/assets_precompile.log 2>&1
-  check_error 'precompiling assets' 'assets_precompile'
-fi
-
+handle_assets_precompile
+handle_procfile
 sudo chown -R git:www-data * > $LOG_DIR/chown.log 2>&1
 cd -
 

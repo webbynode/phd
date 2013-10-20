@@ -26,15 +26,6 @@ echo "Configuring Rails 3 application..."
 configure_vhost
 already_existed=$?
 
-# rails2=`gem list rails | grep rails | grep \(3`
-# if [ "$?" == "1" ]; then
-#   echo "  => Missing Rails 3 gems, installing..."
-#   sudo apt-get install -q -y libpq-dev > $LOG_DIR/rails3_prereq.log 2>&1
-  
-#   sudo gem install tzinfo builder memcache-client rack rack-test rack-mount erubis mail text-format thor bundler i18n rake --source http://rubygems.org/  > $LOG_DIR/rails3_install.log 2>&1
-#   sudo gem install rails --source http://rubygems.org/ > $LOG_DIR/rails3_install.log 2>&1
-# fi
-
 if [ -z "$skipdb" ]; then
   echo "  => Configuring database..."
   sudo config_app_db $app_name > $LOG_DIR/config_db.log 2>&1
@@ -98,35 +89,7 @@ if rake_task_defined "assets:precompile"; then
   check_error 'precompiling assets' 'assets_precompile'
 fi
 
-if [ -f $dir/Procfile ]; then
-  echo "  => Setting environment variables..."
-  cd /var/webbynode/env
-  for f in *; do
-     if [ ! -d /var/webbynode/env/$f ]; then
-        contents=`cat /var/webbynode/env/$f`
-        [ -z $contents ] || echo "$f=$(cat /var/webbynode/env/$f)" >> $dir/.env
-     fi
-  done
-
-  if [ -d /var/webbynode/env/$app_name ]; then
-    cd /var/webbynode/env/$app_name
-    for f in *; do
-       contents=`cat /var/webbbynode/env/$app_name/$f`
-       [ -s /var/webbynode/env/$app_name/$f ]] || [ -z $contents ] || echo "$f=$(cat /var/webbynode/env/$app_name/$f)" >> $dir/.env
-    done
-  fi
-
-  echo "  => Stopping application..."
-  sudo stop $app_name > /dev/null 2>&1
-
-  echo "  => Setting up processes..."
-  cd $dir
-  sudo foreman export upstart /etc/init -a "$app_name" -u git
-
-  echo "  => Starting processes..."
-  sudo start $app_name
-fi
-
+handle_procfile
 sudo chown -R git:www-data * > $LOG_DIR/chown.log 2>&1
 cd -
 
