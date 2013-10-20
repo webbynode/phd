@@ -248,10 +248,16 @@ handle_procfile() {
   if [ -f $dir/Procfile ]; then
     echo "  => Setting environment variables..."
     cd /var/webbynode/env
+    if [ -f $dir/.env ]; then
+      rm $dir/.env
+    fi
+
+    touch $dir/.env
+
     for f in *; do
        if [ ! -d /var/webbynode/env/$f ]; then
           contents=`cat /var/webbynode/env/$f`
-          [ -z $contents ] || echo "$f=$(cat /var/webbynode/env/$f)" >> $dir/.env
+          [ -z $contents ] || echo "$f=$contents" >> $dir/.env
        fi
     done
 
@@ -259,12 +265,16 @@ handle_procfile() {
       cd /var/webbynode/env/$app_name
       for f in *; do
          contents=`cat /var/webbynode/env/$app_name/$f`
-         [ -s /var/webbynode/env/$app_name/$f ] || [ -z $contents ] || echo "$f=$(cat /var/webbynode/env/$app_name/$f)" >> $dir/.env
+         [ -z $contents ] || echo "$f=$contents" >> $dir/.env
       done
     fi
 
     echo "  => Stopping application..."
     sudo stop $app_name > /dev/null 2>&1
+    if [ -x /var/webbynode/hooks/$app_name/post-stop ]; then
+      echo "  => Running post stop hook..."
+      source /var/webbynode/hooks/$app_name/post-stop
+    fi
 
     echo "  => Setting up processes..."
     cd $dir
