@@ -68,7 +68,7 @@ if [ $? -eq 1 ]; then
 fi
 
 echo "  => Migrating database..."
-RAILS_ENV=production rake db:migrate > $LOG_DIR/db_migrate.log 2>&1
+RAILS_ENV=production bundle exec rake db:migrate > $LOG_DIR/db_migrate.log 2>&1
 check_error 'migrating database' 'db_migrate'
 
 sudo chown -R git:www-data * > $LOG_DIR/chown.log 2>&1

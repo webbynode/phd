@@ -50,7 +50,7 @@ fi
 
 cd $dir
 
-check_bundler
+using_bundler=check_bundler
 if [ "$?" == "0" ]; then
   echo "  => Installing missing gems..."
   sudo RAILS_ENV=production rake gems:install > $LOG_DIR/gems_install.log 2>&1
@@ -58,7 +58,11 @@ if [ "$?" == "0" ]; then
 fi
 
 echo "  => Migrating database..."
-RAILS_ENV=production rake db:migrate > $LOG_DIR/db_migrate.log 2>&1
+if [[ $using_bundler == 1 ]]; then
+  RAILS_ENV=production bundle exec rake db:migrate > $LOG_DIR/db_migrate.log 2>&1
+else
+  RAILS_ENV=production rake db:migrate > $LOG_DIR/db_migrate.log 2>&1
+fi
 check_error 'migrating database' 'db_migrate'
 
 sudo chown -R git:www-data * > $LOG_DIR/chown.log 2>&1
